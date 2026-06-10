@@ -5,17 +5,17 @@
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>close.connect — find your community</title>
 <meta name="description" content="Browse WhatsApp communities by interest. Online or offline — discover groups that match your vibe and join in one tap."/>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css"/>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-:root {
-  --bg:#0a0a0a; --surface:#111111; --surface2:#181818;
-  --border:#242424; --border2:#2e2e2e;
-  --text:#f0ede8; --text2:#888070; --text3:#484038;
-  --green:#5DCAA5; --green-dim:#0d2218; --green-mid:#1D9E75;
-  --pink:#D4537E; --wa:#25D366; --wa-dim:#0a2214;
-  --radius:12px; --radius-sm:8px;
+:root{
+  --bg:#0a0a0a;--surface:#111;--surface2:#181818;
+  --border:#242424;--border2:#2e2e2e;
+  --text:#f0ede8;--text2:#888070;--text3:#484038;
+  --green:#5DCAA5;--green-dim:#0d2218;--green-mid:#1D9E75;
+  --pink:#D4537E;--wa:#25D366;--wa-dim:#0a2214;
+  --radius:12px;--radius-sm:8px;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
@@ -23,167 +23,399 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min
 a{text-decoration:none;color:inherit}
 button{cursor:pointer;font-family:inherit}
 
-/* HEADER */
-.header{position:sticky;top:0;z-index:200;background:rgba(10,10,10,0.95);backdrop-filter:blur(16px);border-bottom:0.5px solid var(--border);padding:0 24px;height:60px;display:flex;align-items:center;gap:16px}
-.logo{font-family:'Syne',sans-serif;font-weight:800;font-size:18px;letter-spacing:-0.5px;white-space:nowrap;flex-shrink:0}
+/* ── HEADER ── */
+.header{
+  position:sticky;top:0;z-index:200;
+  background:rgba(10,10,10,.96);backdrop-filter:blur(16px);
+  border-bottom:.5px solid var(--border);
+  padding:0 32px;height:62px;
+  display:flex;align-items:center;gap:16px;
+}
+.logo{
+  font-family:'Syne',sans-serif;font-weight:800;font-size:20px;
+  letter-spacing:-.5px;white-space:nowrap;flex-shrink:0;color:var(--text);
+}
 .logo span{color:var(--green)}
-.header-search{flex:1;max-width:500px;display:flex;align-items:center;background:var(--surface);border:0.5px solid var(--border2);border-radius:999px;padding:0 16px;height:38px;gap:8px;transition:border-color .15s}
+.header-search{
+  flex:1;max-width:460px;
+  display:flex;align-items:center;
+  background:var(--surface2);border:.5px solid var(--border2);
+  border-radius:999px;padding:0 16px;height:40px;gap:9px;
+  transition:border-color .15s;
+}
 .header-search:focus-within{border-color:#3a3a3a}
-.header-search i{color:var(--text3);font-size:15px}
-.header-search input{background:transparent;border:none;outline:none;color:var(--text);font-size:14px;font-family:inherit;width:100%;caret-color:var(--green)}
+.header-search i{color:var(--text3);font-size:15px;flex-shrink:0}
+.header-search input{
+  background:transparent;border:none;outline:none;
+  color:var(--text);font-size:14px;font-family:inherit;width:100%;
+  caret-color:var(--green);
+}
 .header-search input::placeholder{color:var(--text3)}
-.header-right{display:flex;gap:10px;align-items:center;margin-left:auto}
-.add-btn{display:flex;align-items:center;gap:7px;padding:0 18px;height:38px;background:var(--green);border:none;border-radius:999px;color:#04342C;font-size:13px;font-weight:700;transition:background .15s;white-space:nowrap}
+.header-right{margin-left:auto;display:flex;gap:10px;align-items:center}
+.add-btn{
+  display:flex;align-items:center;gap:7px;
+  padding:0 20px;height:40px;
+  background:var(--green);border:none;border-radius:999px;
+  color:#04342C;font-size:13px;font-weight:700;
+  transition:background .15s;white-space:nowrap;
+}
 .add-btn:hover{background:var(--green-mid);color:#fff}
 .add-btn i{font-size:15px}
 
-/* HERO */
-.hero{padding:40px 24px 0;max-width:1100px;margin:0 auto}
-.hero h1{font-family:'Syne',sans-serif;font-size:clamp(28px,4vw,46px);font-weight:800;letter-spacing:-1px;line-height:1.1;margin-bottom:10px}
+/* ── HERO ── */
+.hero{padding:48px 32px 0;max-width:1140px;margin:0 auto}
+.hero h1{
+  font-family:'Syne',sans-serif;
+  font-size:clamp(32px,4.5vw,52px);
+  font-weight:800;letter-spacing:-1.5px;
+  line-height:1.05;margin-bottom:14px;
+}
 .hero h1 em{font-style:normal;color:var(--green)}
-.hero p{font-size:15px;color:var(--text2);max-width:500px;margin-bottom:24px;line-height:1.65}
+.hero p{
+  font-size:16px;color:var(--text2);
+  max-width:480px;margin-bottom:36px;line-height:1.7;
+}
 
-/* LAYOUT */
-.layout{display:grid;grid-template-columns:220px 1fr;gap:28px;max-width:1100px;margin:0 auto;padding:24px 24px 60px}
+/* ── LAYOUT ── */
+.layout{
+  display:grid;grid-template-columns:220px 1fr;
+  gap:32px;max-width:1140px;margin:0 auto;
+  padding:28px 32px 80px;
+}
 
-/* SIDEBAR */
-.sidebar{display:flex;flex-direction:column;gap:6px}
-.sidebar-label{font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.6px;padding:0 10px;margin-bottom:4px;margin-top:8px}
+/* ── SIDEBAR ── */
+.sidebar{display:flex;flex-direction:column;gap:4px}
+.sidebar-label{
+  font-size:10px;font-weight:700;color:var(--text3);
+  letter-spacing:.7px;padding:0 12px;
+  margin-bottom:6px;margin-top:10px;
+}
 .sidebar-label:first-child{margin-top:0}
-.cat-btn{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:var(--radius-sm);border:none;background:transparent;color:var(--text2);font-size:13px;font-weight:500;text-align:left;transition:background .12s,color .12s;width:100%}
+.cat-btn{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 12px;border-radius:var(--radius-sm);
+  border:none;background:transparent;
+  color:var(--text2);font-size:13px;font-weight:500;
+  text-align:left;transition:background .12s,color .12s;width:100%;
+}
 .cat-btn:hover{background:var(--surface);color:var(--text)}
 .cat-btn.active{background:var(--green-dim);color:var(--green)}
 .cat-btn i{font-size:16px;flex-shrink:0}
-.cat-count{margin-left:auto;font-size:11px;background:var(--surface2);padding:1px 7px;border-radius:999px;color:var(--text3)}
+.cat-count{
+  margin-left:auto;font-size:11px;
+  background:var(--surface2);
+  padding:2px 8px;border-radius:999px;color:var(--text3);
+}
 .cat-btn.active .cat-count{background:rgba(93,202,165,.12);color:var(--green)}
 
-/* MAIN */
+/* ── MAIN ── */
 .main{min-width:0}
-.filter-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;align-items:center}
+.filter-row{
+  display:flex;gap:8px;flex-wrap:wrap;
+  margin-bottom:22px;align-items:center;
+}
 .filter-label{font-size:12px;color:var(--text3);margin-right:4px}
-.fpill{padding:6px 14px;border-radius:999px;border:0.5px solid var(--border2);background:var(--surface);color:var(--text2);font-size:12px;font-weight:500;transition:all .12s}
+.fpill{
+  padding:7px 16px;border-radius:999px;
+  border:.5px solid var(--border2);background:var(--surface);
+  color:var(--text2);font-size:12px;font-weight:500;
+  transition:all .12s;
+}
 .fpill.on{background:var(--green);border-color:var(--green);color:#04342C}
 .fpill:hover:not(.on){border-color:#3a3a3a;color:var(--text)}
 
-/* GRID */
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px;margin-bottom:28px}
+/* ── GRID ── */
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(230px,1fr));
+  gap:14px;margin-bottom:28px;
+}
 
-/* CARD */
-.card{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius);padding:16px;display:flex;flex-direction:column;gap:10px;transition:border-color .15s,transform .15s;position:relative;overflow:hidden;cursor:pointer}
+/* ── CARD ── */
+.card{
+  background:var(--surface);border:.5px solid var(--border);
+  border-radius:var(--radius);padding:18px;
+  display:flex;flex-direction:column;gap:12px;
+  transition:border-color .15s,transform .15s;
+  position:relative;overflow:hidden;cursor:pointer;
+}
 .card:hover{border-color:var(--border2);transform:translateY(-2px)}
-.card-top{display:flex;align-items:flex-start;gap:10px}
-.card-icon{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.card-top{display:flex;align-items:flex-start;gap:12px}
+.card-icon{
+  width:46px;height:46px;border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:24px;flex-shrink:0;
+}
 .card-meta{flex:1;min-width:0}
-.card-name{font-size:14px;font-weight:500;color:var(--text);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.card-cat{font-size:10px;font-weight:700;padding:2px 8px;border-radius:999px;display:inline-block}
-.card-desc{font-size:12px;color:var(--text2);line-height:1.55;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.card-footer{display:flex;align-items:center;justify-content:space-between;padding-top:8px;border-top:0.5px solid var(--border);gap:8px}
-.card-cat-label{font-size:11px;color:var(--text3);display:flex;align-items:center;gap:4px}
+.card-name{
+  font-size:14px;font-weight:500;color:var(--text);
+  margin-bottom:5px;line-height:1.3;
+}
+.card-cat{
+  font-size:10px;font-weight:700;
+  padding:2px 9px;border-radius:999px;display:inline-block;
+}
+.card-new{
+  font-size:10px;font-weight:700;
+  padding:2px 9px;border-radius:999px;
+  background:#1a0d2e;color:var(--pink);
+  display:inline-block;margin-left:5px;
+}
+.card-desc{
+  font-size:12px;color:var(--text2);line-height:1.6;
+  display:-webkit-box;-webkit-line-clamp:2;
+  -webkit-box-orient:vertical;overflow:hidden;
+}
+.card-footer{
+  display:flex;align-items:center;
+  justify-content:space-between;
+  padding-top:10px;border-top:.5px solid var(--border);gap:8px;
+}
+.card-cat-label{
+  font-size:11px;color:var(--text3);
+  display:flex;align-items:center;gap:4px;
+}
 .card-cat-label i{font-size:11px}
-.wa-btn{display:flex;align-items:center;gap:6px;padding:6px 12px;background:var(--wa-dim);border:0.5px solid rgba(37,211,102,.2);border-radius:999px;color:var(--wa);font-size:11px;font-weight:700;transition:all .15s}
+.wa-btn{
+  display:flex;align-items:center;gap:6px;
+  padding:7px 14px;
+  background:var(--wa-dim);
+  border:.5px solid rgba(37,211,102,.2);
+  border-radius:999px;color:var(--wa);
+  font-size:12px;font-weight:700;transition:all .15s;
+}
 .wa-btn:hover{background:#0d3320;border-color:var(--wa)}
-.wa-btn i{font-size:13px}
-.verified-dot{position:absolute;top:12px;right:12px;width:8px;height:8px;background:var(--green);border-radius:50%;border:2px solid var(--surface)}
+.wa-btn i{font-size:14px}
+.verified-dot{
+  position:absolute;top:14px;right:14px;
+  width:8px;height:8px;background:var(--green);
+  border-radius:50%;border:2px solid var(--surface);
+}
 
-/* LOADING SKELETON */
-.skeleton{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius);padding:16px;display:flex;flex-direction:column;gap:10px}
-.skel-line{background:var(--surface2);border-radius:4px;animation:shimmer 1.5s infinite}
-@keyframes shimmer{0%,100%{opacity:.4}50%{opacity:.8}}
+/* ── SKELETON ── */
+.skeleton{
+  background:var(--surface);border:.5px solid var(--border);
+  border-radius:var(--radius);padding:18px;
+  display:flex;flex-direction:column;gap:12px;
+}
+.skel-line{
+  background:var(--surface2);border-radius:4px;
+  animation:shimmer 1.5s infinite;
+}
+@keyframes shimmer{0%,100%{opacity:.4}50%{opacity:.9}}
 
-/* PAGINATION */
-.pagination{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-top:0.5px solid var(--border)}
-.pag-info{font-size:12px;color:var(--text3)}
+/* ── PAGINATION ── */
+.pagination{
+  display:flex;align-items:center;
+  justify-content:space-between;
+  padding:16px 0;border-top:.5px solid var(--border);
+}
+.pag-info{font-size:13px;color:var(--text3)}
 .pag-btns{display:flex;align-items:center;gap:8px}
-.pag-btn{width:34px;height:34px;border-radius:var(--radius-sm);border:0.5px solid var(--border2);background:var(--surface);color:var(--text2);font-size:15px;display:flex;align-items:center;justify-content:center;transition:all .12s}
-.pag-btn:hover{border-color:#3a3a3a;color:var(--text)}
+.pag-btn{
+  width:36px;height:36px;border-radius:var(--radius-sm);
+  border:.5px solid var(--border2);background:var(--surface);
+  color:var(--text2);font-size:16px;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .12s;
+}
+.pag-btn:hover:not(:disabled){border-color:#3a3a3a;color:var(--text)}
 .pag-btn:disabled{opacity:.3;cursor:not-allowed}
 .pag-current{font-size:13px;font-weight:500;color:var(--text);padding:0 6px}
 .pag-total{font-size:13px;color:var(--text3)}
 
-/* OVERLAY */
-.overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:500;display:none;align-items:center;justify-content:center;padding:20px}
+/* ── OVERLAY ── */
+.overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.75);
+  z-index:500;display:none;align-items:center;
+  justify-content:center;padding:20px;
+}
 .overlay.open{display:flex}
 
-/* DETAIL MODAL */
-.detail-modal{background:var(--surface);border:0.5px solid var(--border2);border-radius:20px;width:100%;max-width:560px;overflow:hidden;animation:modalIn .2s ease both;max-height:92vh;display:flex;flex-direction:column}
-.detail-banner{height:110px;display:flex;align-items:center;justify-content:center;font-size:52px;position:relative;flex-shrink:0}
-.detail-banner-close{position:absolute;top:12px;right:12px;width:32px;height:32px;border-radius:50%;background:rgba(0,0,0,.5);border:0.5px solid rgba(255,255,255,.1);color:#fff;font-size:15px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .12s}
+/* ── DETAIL MODAL ── */
+.detail-modal{
+  background:var(--surface);border:.5px solid var(--border2);
+  border-radius:20px;width:100%;max-width:540px;
+  overflow:hidden;animation:modalIn .2s ease both;
+  max-height:92vh;display:flex;flex-direction:column;
+}
+@keyframes modalIn{
+  from{opacity:0;transform:translateY(10px) scale(.98)}
+  to{opacity:1;transform:translateY(0) scale(1)}
+}
+.detail-banner{
+  height:110px;display:flex;align-items:center;
+  justify-content:center;font-size:52px;
+  position:relative;flex-shrink:0;
+}
+.detail-banner-close{
+  position:absolute;top:12px;right:12px;
+  width:32px;height:32px;border-radius:50%;
+  background:rgba(0,0,0,.5);border:.5px solid rgba(255,255,255,.1);
+  color:#fff;font-size:15px;display:flex;align-items:center;
+  justify-content:center;cursor:pointer;transition:background .12s;
+}
 .detail-banner-close:hover{background:rgba(0,0,0,.75)}
-.detail-verified{position:absolute;top:12px;left:12px;display:flex;align-items:center;gap:5px;background:rgba(93,202,165,.15);border:0.5px solid rgba(93,202,165,.3);padding:3px 9px;border-radius:999px;font-size:10px;font-weight:700;color:var(--green)}
-.detail-body{padding:22px 24px 24px;overflow-y:auto;flex:1}
+.detail-verified{
+  position:absolute;top:12px;left:12px;
+  display:flex;align-items:center;gap:5px;
+  background:rgba(93,202,165,.15);
+  border:.5px solid rgba(93,202,165,.3);
+  padding:3px 10px;border-radius:999px;
+  font-size:10px;font-weight:700;color:var(--green);
+}
+.detail-body{padding:22px 24px;overflow-y:auto;flex:1}
 .detail-body::-webkit-scrollbar{width:4px}
 .detail-body::-webkit-scrollbar-thumb{background:var(--border2);border-radius:999px}
-.detail-name{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--text);letter-spacing:-.4px;margin-bottom:8px;line-height:1.15}
+.detail-name{
+  font-family:'Syne',sans-serif;font-size:22px;font-weight:800;
+  color:var(--text);letter-spacing:-.4px;margin-bottom:10px;line-height:1.15;
+}
 .detail-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px}
 .detail-tag{padding:3px 10px;border-radius:999px;font-size:11px;font-weight:700}
-.detail-new{padding:3px 10px;border-radius:999px;font-size:11px;font-weight:700;background:#1a0d2e;color:var(--pink)}
-.detail-section-lbl{font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.5px;margin-bottom:8px}
+.detail-new{
+  padding:3px 10px;border-radius:999px;
+  font-size:11px;font-weight:700;background:#1a0d2e;color:var(--pink);
+}
+.detail-section-lbl{
+  font-size:10px;font-weight:700;color:var(--text3);
+  letter-spacing:.5px;margin-bottom:8px;
+}
 .detail-desc{font-size:14px;color:var(--text2);line-height:1.7}
-.detail-meta-row{display:flex;gap:12px;flex-wrap:wrap;margin-top:18px}
-.detail-meta-item{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text3);background:var(--surface2);padding:6px 12px;border-radius:var(--radius-sm);border:0.5px solid var(--border)}
+.detail-meta-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+.detail-meta-item{
+  display:flex;align-items:center;gap:6px;
+  font-size:12px;color:var(--text3);
+  background:var(--surface2);padding:7px 12px;
+  border-radius:var(--radius-sm);border:.5px solid var(--border);
+}
 .detail-meta-item i{font-size:14px}
-.detail-footer{padding:16px 24px 24px;border-top:0.5px solid var(--border);flex-shrink:0}
-.detail-join-btn{width:100%;padding:14px 0;border-radius:999px;border:none;background:var(--wa);color:#04150a;font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:9px;transition:background .15s;letter-spacing:-.2px;text-decoration:none}
+.detail-footer{
+  padding:16px 24px 24px;
+  border-top:.5px solid var(--border);flex-shrink:0;
+}
+.detail-join-btn{
+  width:100%;padding:14px 0;border-radius:999px;border:none;
+  background:var(--wa);color:#04150a;
+  font-size:15px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;gap:9px;
+  transition:background .15s;text-decoration:none;
+}
 .detail-join-btn:hover{background:#1fb855}
 .detail-join-btn i{font-size:20px}
 .detail-hint{text-align:center;font-size:11px;color:var(--text3);margin-top:8px}
 
-/* SUBMIT MODAL */
-.modal{background:var(--surface);border:0.5px solid var(--border2);border-radius:18px;width:100%;max-width:520px;padding:28px;animation:modalIn .2s ease both;max-height:90vh;overflow-y:auto}
-@keyframes modalIn{from{opacity:0;transform:translateY(12px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
-.modal-header{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:24px}
-.modal-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:var(--text)}
-.modal-sub{font-size:13px;color:var(--text2);margin-top:3px}
-.modal-close{width:32px;height:32px;border-radius:50%;border:0.5px solid var(--border2);background:transparent;color:var(--text2);font-size:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .12s}
+/* ── ADD MODAL ── */
+.modal{
+  background:var(--surface);border:.5px solid var(--border2);
+  border-radius:20px;width:100%;max-width:520px;
+  padding:28px;animation:modalIn .2s ease both;
+  max-height:90vh;overflow-y:auto;
+}
+.modal-header{
+  display:flex;align-items:flex-start;
+  justify-content:space-between;gap:12px;margin-bottom:24px;
+}
+.modal-title{font-family:'Syne',sans-serif;font-size:19px;font-weight:800;color:var(--text)}
+.modal-sub{font-size:13px;color:var(--text2);margin-top:4px}
+.modal-close{
+  width:32px;height:32px;border-radius:50%;
+  border:.5px solid var(--border2);background:transparent;
+  color:var(--text2);font-size:16px;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;transition:all .12s;
+}
 .modal-close:hover{background:var(--surface2);color:var(--text)}
-.field{margin-bottom:16px}
-.field label{display:block;font-size:11px;font-weight:700;color:var(--text3);letter-spacing:.5px;margin-bottom:7px}
-.field input,.field textarea{width:100%;background:var(--surface2);border:0.5px solid var(--border2);border-radius:var(--radius-sm);padding:11px 14px;color:var(--text);font-size:14px;font-family:inherit;outline:none;transition:border-color .15s;resize:none;appearance:none}
+.field{margin-bottom:18px}
+.field label{
+  display:block;font-size:11px;font-weight:700;
+  color:var(--text3);letter-spacing:.5px;margin-bottom:7px;
+}
+.field input,.field textarea{
+  width:100%;background:var(--surface2);
+  border:.5px solid var(--border2);border-radius:var(--radius-sm);
+  padding:12px 14px;color:var(--text);
+  font-size:14px;font-family:inherit;outline:none;
+  transition:border-color .15s;resize:none;
+}
 .field input:focus,.field textarea:focus{border-color:#3a3a3a}
 .field input::placeholder,.field textarea::placeholder{color:var(--text3)}
 .wa-input-wrap{position:relative}
-.wa-prefix{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:16px;color:var(--wa)}
-.wa-input-wrap input{padding-left:38px}
-.field-hint{font-size:11px;color:var(--text3);margin-top:5px;line-height:1.5}
+.wa-prefix{
+  position:absolute;left:13px;top:50%;
+  transform:translateY(-50%);
+  font-size:16px;color:var(--wa);
+}
+.wa-input-wrap input{padding-left:40px}
+.field-hint{font-size:11px;color:var(--text3);margin-top:6px;line-height:1.5}
 .cat-pills-select{display:flex;flex-wrap:wrap;gap:7px}
-.cpill{padding:6px 14px;border-radius:999px;border:0.5px solid var(--border2);background:var(--surface2);color:var(--text2);font-size:12px;font-weight:500;transition:all .12s}
+.cpill{
+  padding:7px 14px;border-radius:999px;
+  border:.5px solid var(--border2);
+  background:var(--surface2);color:var(--text2);
+  font-size:12px;font-weight:500;transition:all .12s;
+}
 .cpill.sel{background:var(--green-dim);border-color:var(--green);color:var(--green)}
 .cpill:hover:not(.sel){border-color:#3a3a3a;color:var(--text)}
 .modal-btns{display:flex;gap:10px;margin-top:24px}
-.btn-cancel{flex:1;padding:12px 0;border-radius:999px;border:0.5px solid var(--border2);background:transparent;color:var(--text2);font-size:13px;font-weight:500;transition:all .15s}
+.btn-cancel{
+  flex:1;padding:13px 0;border-radius:999px;
+  border:.5px solid var(--border2);background:transparent;
+  color:var(--text2);font-size:13px;font-weight:500;transition:all .15s;
+}
 .btn-cancel:hover{background:var(--surface2);color:var(--text)}
-.btn-submit{flex:2;padding:12px 0;border-radius:999px;border:none;background:var(--wa);color:#04150a;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:7px;transition:all .15s}
+.btn-submit{
+  flex:2;padding:13px 0;border-radius:999px;
+  border:none;background:var(--wa);color:#04150a;
+  font-size:13px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;gap:7px;
+  transition:all .15s;
+}
 .btn-submit:hover{background:#1fb855}
 .btn-submit i{font-size:16px}
 .btn-submit:disabled{opacity:.6;cursor:not-allowed}
 
-/* TOAST */
-.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--green-dim);border:0.5px solid var(--green);color:var(--green);padding:10px 20px;border-radius:999px;font-size:13px;font-weight:500;display:flex;align-items:center;gap:8px;opacity:0;pointer-events:none;transition:all .3s ease;z-index:999;white-space:nowrap}
+/* ── TOAST ── */
+.toast{
+  position:fixed;bottom:28px;left:50%;
+  transform:translateX(-50%) translateY(20px);
+  background:var(--green-dim);border:.5px solid var(--green);
+  color:var(--green);padding:11px 22px;border-radius:999px;
+  font-size:13px;font-weight:500;
+  display:flex;align-items:center;gap:8px;
+  opacity:0;pointer-events:none;
+  transition:all .3s ease;z-index:999;white-space:nowrap;
+}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 .toast i{font-size:15px}
 .toast.error{background:#2a0e0e;border-color:var(--pink);color:var(--pink)}
 
-/* EMPTY */
-.empty{grid-column:1/-1;padding:60px 0;display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center}
-.empty i{font-size:44px;color:var(--text3)}
-.empty p{font-size:14px;color:var(--text2)}
+/* ── EMPTY STATE ── */
+.empty{
+  grid-column:1/-1;padding:80px 0;
+  display:flex;flex-direction:column;
+  align-items:center;gap:14px;text-align:center;
+}
+.empty i{font-size:48px;color:var(--text3)}
+.empty p{font-size:15px;color:var(--text2)}
 .empty small{font-size:12px;color:var(--text3)}
 
-/* RESPONSIVE */
-@media(max-width:700px){
-  .layout{grid-template-columns:1fr}
+/* ── RESPONSIVE ── */
+@media(max-width:760px){
+  .layout{grid-template-columns:1fr;padding:20px 16px 60px}
+  .hero{padding:32px 16px 0}
+  .header{padding:0 16px}
   .sidebar{flex-direction:row;flex-wrap:wrap;gap:6px}
   .sidebar-label{display:none}
-  .cat-btn{width:auto;padding:7px 12px}
+  .cat-btn{width:auto;padding:7px 12px;font-size:12px}
   .cat-count{display:none}
-  .hero h1{font-size:28px}
+  .hero h1{font-size:30px}
   .header-search{display:none}
 }
 </style>
 </head>
 <body>
 
-<!-- HEADER -->
 <header class="header">
   <div class="logo">close<span>.</span>connect</div>
   <div class="header-search">
@@ -197,21 +429,18 @@ button{cursor:pointer;font-family:inherit}
   </div>
 </header>
 
-<!-- HERO -->
 <div class="hero">
   <h1>find your <em>people</em><br/>wherever you are</h1>
   <p>Browse WhatsApp communities by interest. Online or offline — discover groups that match your vibe and join in one tap.</p>
 </div>
 
-<!-- LAYOUT -->
 <div class="layout">
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-label">categories</div>
     <button class="cat-btn active" onclick="setCategory('all',this)">
-      <i class="ti ti-grid-dots"></i> all communities
+      <i class="ti ti-grid-dots"></i>all communities
       <span class="cat-count" id="count-all">—</span>
     </button>
-    <!-- category buttons injected by JS -->
   </aside>
 
   <main class="main">
@@ -247,7 +476,7 @@ button{cursor:pointer;font-family:inherit}
       <span id="dm-emoji"></span>
       <button class="detail-banner-close" onclick="closeDetail()"><i class="ti ti-x"></i></button>
       <div class="detail-verified" id="dm-verified" style="display:none">
-        <i class="ti ti-circle-check"></i> verified
+        <i class="ti ti-circle-check"></i>verified
       </div>
     </div>
     <div class="detail-body">
@@ -272,7 +501,7 @@ button{cursor:pointer;font-family:inherit}
     <div class="modal-header">
       <div>
         <div class="modal-title">add your community</div>
-        <div class="modal-sub">paste your WhatsApp invite link and fill in the details</div>
+        <div class="modal-sub">paste your WhatsApp link and fill in the details</div>
       </div>
       <button class="modal-close" onclick="closeModal()"><i class="ti ti-x"></i></button>
     </div>
@@ -282,7 +511,7 @@ button{cursor:pointer;font-family:inherit}
         <i class="ti ti-brand-whatsapp wa-prefix"></i>
         <input type="url" id="f-link" placeholder="https://chat.whatsapp.com/…"/>
       </div>
-      <div class="field-hint">paste the invite link from WhatsApp → Community info → Invite via link</div>
+      <div class="field-hint">WhatsApp → Community info → Invite via link</div>
     </div>
     <div class="field">
       <label>COMMUNITY NAME</label>
@@ -293,9 +522,8 @@ button{cursor:pointer;font-family:inherit}
       <textarea id="f-desc" rows="3" placeholder="what is this community about? who should join?"></textarea>
     </div>
     <div class="field">
-      <label>YOUR EMAIL</label>
+      <label>YOUR EMAIL <span style="color:var(--text3);font-weight:400;font-size:10px">(optional — we'll notify you when it goes live)</span></label>
       <input type="email" id="f-email" placeholder="you@example.com"/>
-      <div class="field-hint">we'll notify you once your community is live</div>
     </div>
     <div class="field">
       <label>CATEGORY</label>
@@ -313,85 +541,71 @@ button{cursor:pointer;font-family:inherit}
 <!-- TOAST -->
 <div class="toast" id="toast">
   <i class="ti ti-circle-check"></i>
-  <span id="toast-msg">submitted! we'll review and add it shortly.</span>
+  <span id="toast-msg">community added!</span>
 </div>
 
 <script>
-// ─────────────────────────────────────────
-// CONFIGURATION — replace these two values
-// ─────────────────────────────────────────
-const SUPABASE_URL  = 'YOUR_SUPABASE_URL'   // e.g. https://abcdef.supabase.co
-const SUPABASE_ANON = 'YOUR_SUPABASE_ANON_KEY'
-// ─────────────────────────────────────────
+// ── CONFIG — fill in your Supabase values ──
+const SUPABASE_URL  = 'https://vcfrezqaagrmgxrtmvwg.supabase.co'
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZjZnJlenFhYWdybWd4cnRtdndnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEwNTgzNzgsImV4cCI6MjA5NjYzNDM3OH0.CL-i8tus0pjAKnPNZSm5D1V7Q3va6mwIFOfPQwC3EdY'
+// ──────────────────────────────────────────
 
 const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON)
 
 const PER_PAGE = 12
-let currentPage = 1
-let currentCat  = 'all'
-let currentFilter = 'all'
-let searchQuery = ''
-let selectedCat = ''
-let categories  = []
-let totalCount  = 0
+let page = 1, cat = 'all', filter = 'all', q = '', selCatSlug = ''
+let cats = [], total = 0
 
-// ── INIT ──────────────────────────────────
+// ── SIDEBAR ICONS ──
+const CAT_ICONS = {
+  sports:'ti-run', tech:'ti-code', arts:'ti-palette',
+  food:'ti-coffee', music:'ti-music', wellness:'ti-heart',
+  gaming:'ti-device-gamepad-2', travel:'ti-plane', photography:'ti-camera'
+}
+
+// ── INIT ──
 async function init() {
   showSkeletons()
-  categories = await loadCategories()
-  renderSidebar()
-  renderCatPills()
-  await loadAndRender()
-}
-
-// ── CATEGORIES ────────────────────────────
-async function loadCategories() {
   const { data } = await db.from('categories').select('*').order('sort_order')
-  return data || []
+  cats = data || []
+  buildSidebar()
+  buildCatPills()
+  await loadGrid()
 }
 
-function renderSidebar() {
-  const sidebar = document.getElementById('sidebar')
-  const existing = sidebar.querySelectorAll('.cat-btn:not(:first-child)')
-  existing.forEach(el => el.remove())
-  const icons = {
-    sports:'ti-run', tech:'ti-code', arts:'ti-palette',
-    food:'ti-coffee', music:'ti-music', wellness:'ti-heart',
-    gaming:'ti-device-gamepad-2', travel:'ti-plane', photography:'ti-camera'
-  }
-  categories.forEach(cat => {
+// ── SIDEBAR ──
+function buildSidebar() {
+  const sb = document.getElementById('sidebar')
+  sb.querySelectorAll('.cat-btn:not(:first-child)').forEach(el => el.remove())
+  cats.forEach(c => {
     const btn = document.createElement('button')
     btn.className = 'cat-btn'
-    btn.innerHTML = `<i class="ti ${icons[cat.slug] || 'ti-tag'}"></i> ${cat.name}<span class="cat-count">—</span>`
-    btn.onclick = () => {
-      setCategory(cat.slug, btn)
-    }
-    sidebar.appendChild(btn)
+    btn.innerHTML = `<i class="ti ${CAT_ICONS[c.slug]||'ti-tag'}"></i>${c.name}<span class="cat-count">—</span>`
+    btn.onclick = () => setCategory(c.slug, btn)
+    sb.appendChild(btn)
   })
 }
 
-function renderCatPills() {
-  const container = document.getElementById('cat-pills-form')
-  container.innerHTML = ''
-  categories.forEach(cat => {
+// ── CAT PILLS IN FORM ──
+function buildCatPills() {
+  const wrap = document.getElementById('cat-pills-form')
+  wrap.innerHTML = ''
+  cats.forEach(c => {
     const btn = document.createElement('button')
-    btn.className = 'cpill'
     btn.type = 'button'
-    btn.textContent = `${cat.emoji || ''} ${cat.name}`
-    btn.onclick = () => selCat(btn, cat.slug)
-    container.appendChild(btn)
+    btn.className = 'cpill'
+    btn.textContent = `${c.emoji||''} ${c.name}`
+    btn.onclick = () => {
+      wrap.querySelectorAll('.cpill').forEach(b => b.classList.remove('sel'))
+      btn.classList.add('sel')
+      selCatSlug = c.slug
+    }
+    wrap.appendChild(btn)
   })
-  // other option
-  const other = document.createElement('button')
-  other.className = 'cpill'
-  other.type = 'button'
-  other.textContent = '+ other'
-  other.onclick = () => selCat(other, 'other')
-  container.appendChild(other)
 }
 
-// ── LOAD + RENDER ─────────────────────────
-async function loadAndRender() {
+// ── LOAD GRID ──
+async function loadGrid() {
   showSkeletons()
 
   let query = db
@@ -399,180 +613,163 @@ async function loadAndRender() {
     .select('*, categories(name,slug,emoji,color_bg,color_text)', { count: 'exact' })
     .eq('status', 'active')
 
-  if (currentCat !== 'all') {
-    query = query.eq('categories.slug', currentCat)
-  }
-  if (searchQuery) {
-    query = query.or(`name.ilike.%${searchQuery}%,description.ilike.%${searchQuery}%`)
-  }
-  if (currentFilter === 'popular') {
-    query = query.order('click_count', { ascending: false })
-  } else {
-    query = query.order('created_at', { ascending: false })
-  }
-  if (currentFilter === 'new') {
-    const cutoff = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()
+  if (q) query = query.or(`name.ilike.%${q}%,description.ilike.%${q}%`)
+  if (filter === 'popular') query = query.order('click_count', { ascending: false })
+  else query = query.order('created_at', { ascending: false })
+  if (filter === 'new') {
+    const cutoff = new Date(Date.now() - 7*24*60*60*1000).toISOString()
     query = query.gte('created_at', cutoff)
   }
-
-  query = query.range((currentPage - 1) * PER_PAGE, currentPage * PER_PAGE - 1)
+  query = query.range((page-1)*PER_PAGE, page*PER_PAGE-1)
 
   const { data, count } = await query
-  totalCount = count || 0
+  total = count || 0
 
-  // if category filter returns nothing because of join filtering, handle gracefully
-  const communities = (data || []).filter(c => {
-    if (currentCat === 'all') return true
-    return c.categories && c.categories.slug === currentCat
-  })
+  let communities = (data || [])
+  if (cat !== 'all') communities = communities.filter(c => c.categories?.slug === cat)
 
   renderGrid(communities)
   renderPagination()
-  updateCounts()
+  updateSidebarCounts()
 }
 
-function renderGrid(communities) {
+// ── RENDER GRID ──
+function renderGrid(list) {
   const grid = document.getElementById('community-grid')
-  if (communities.length === 0) {
-    grid.innerHTML = `<div class="empty"><i class="ti ti-search-off"></i><p>no communities found</p><small>try a different search or category</small></div>`
+  if (!list.length) {
+    grid.innerHTML = `<div class="empty">
+      <i class="ti ti-search-off"></i>
+      <p>no communities found</p>
+      <small>try a different search or category</small>
+    </div>`
     return
   }
-  grid.innerHTML = communities.map(c => {
-    const cat = c.categories || {}
-    const bg  = cat.color_bg  || '#1a1a1a'
-    const fg  = cat.color_text || '#888'
-    const emoji = cat.emoji || '💬'
-    const catName = cat.name || c.category_id || ''
-    const isNew = isRecent(c.created_at)
-    return `
-      <div class="card" onclick="openDetail('${c.id}')">
-        ${c.is_verified ? '<span class="verified-dot" title="verified"></span>' : ''}
-        <div class="card-top">
-          <div class="card-icon" style="background:${bg}">${emoji}</div>
-          <div class="card-meta">
-            <div class="card-name">${escHtml(c.name)}</div>
-            <span class="card-cat" style="background:${bg};color:${fg}">${escHtml(catName)}</span>
-            ${isNew ? '<span class="card-cat" style="background:#1a0d2e;color:#D4537E;margin-left:4px">new</span>' : ''}
-          </div>
+  grid.innerHTML = list.map(c => {
+    const ct = c.categories || {}
+    const bg = ct.color_bg || '#1a1a1a'
+    const fg = ct.color_text || '#888'
+    const isNew = Date.now() - new Date(c.created_at) < 7*24*60*60*1000
+    return `<div class="card" onclick="openDetail('${c.id}')">
+      ${c.is_verified ? '<span class="verified-dot"></span>' : ''}
+      <div class="card-top">
+        <div class="card-icon" style="background:${bg}">${ct.emoji||'💬'}</div>
+        <div class="card-meta">
+          <div class="card-name">${esc(c.name)}</div>
+          <span class="card-cat" style="background:${bg};color:${fg}">${esc(ct.name||'')}</span>
+          ${isNew ? '<span class="card-new">new</span>' : ''}
         </div>
-        <div class="card-desc">${escHtml(c.description || '')}</div>
-        <div class="card-footer">
-          <span class="card-cat-label"><i class="ti ti-tag"></i>${escHtml(catName)}</span>
-          <a href="${escHtml(c.whatsapp_link)}" target="_blank" rel="noopener"
-             class="wa-btn" onclick="handleJoinClick(event,'${c.id}')">
-            <i class="ti ti-brand-whatsapp"></i>join
-          </a>
-        </div>
-      </div>`
+      </div>
+      <div class="card-desc">${esc(c.description||'')}</div>
+      <div class="card-footer">
+        <span class="card-cat-label"><i class="ti ti-tag"></i>${esc(ct.name||'')}</span>
+        <a href="${esc(c.whatsapp_link)}" target="_blank" rel="noopener"
+           class="wa-btn" onclick="trackClick(event,'${c.id}')">
+          <i class="ti ti-brand-whatsapp"></i>join
+        </a>
+      </div>
+    </div>`
   }).join('')
 }
 
+// ── PAGINATION ──
 function renderPagination() {
-  const totalPages = Math.max(1, Math.ceil(totalCount / PER_PAGE))
-  const start = (currentPage - 1) * PER_PAGE + 1
-  const end   = Math.min(currentPage * PER_PAGE, totalCount)
-  document.getElementById('pag-info').textContent = totalCount > 0
-    ? `showing ${start}–${end} of ${totalCount} communities`
-    : 'no communities found'
-  document.getElementById('pag-cur').textContent = currentPage
-  document.getElementById('pag-tot').textContent = `/ ${totalPages}`
-  document.getElementById('pag-prev').disabled = currentPage <= 1
-  document.getElementById('pag-next').disabled = currentPage >= totalPages
+  const pages = Math.max(1, Math.ceil(total / PER_PAGE))
+  const start = (page-1)*PER_PAGE+1
+  const end   = Math.min(page*PER_PAGE, total)
+  document.getElementById('pag-info').textContent =
+    total > 0 ? `showing ${start}–${end} of ${total} communities` : '0 communities'
+  document.getElementById('pag-cur').textContent = page
+  document.getElementById('pag-tot').textContent = `/ ${pages}`
+  document.getElementById('pag-prev').disabled = page <= 1
+  document.getElementById('pag-next').disabled = page >= pages
 }
 
+// ── SKELETON ──
 function showSkeletons() {
-  const grid = document.getElementById('community-grid')
-  grid.innerHTML = Array(6).fill(0).map(() => `
-    <div class="skeleton">
-      <div class="skel-line" style="height:44px;width:44px;border-radius:10px"></div>
-      <div class="skel-line" style="height:14px;width:70%"></div>
+  document.getElementById('community-grid').innerHTML =
+    Array(6).fill(0).map(() => `<div class="skeleton">
+      <div class="skel-line" style="height:46px;width:46px;border-radius:10px"></div>
+      <div class="skel-line" style="height:14px;width:65%"></div>
       <div class="skel-line" style="height:12px;width:100%"></div>
       <div class="skel-line" style="height:12px;width:80%"></div>
     </div>`).join('')
 }
 
-async function updateCounts() {
-  const { count } = await db.from('communities').select('*', { count: 'exact', head: true }).eq('status', 'active')
+// ── SIDEBAR COUNTS ──
+async function updateSidebarCounts() {
+  const { count } = await db.from('communities')
+    .select('*', { count:'exact', head:true }).eq('status','active')
   document.getElementById('count-all').textContent = count || 0
 }
 
-// ── CONTROLS ──────────────────────────────
-function setCategory(cat, btn) {
-  currentCat = cat
-  currentPage = 1
+// ── CONTROLS ──
+function setCategory(slug, btn) {
+  cat = slug; page = 1
   document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'))
   btn.classList.add('active')
-  loadAndRender()
+  loadGrid()
 }
-
 function setFilter(f, btn) {
-  currentFilter = f
-  currentPage = 1
+  filter = f; page = 1
   document.querySelectorAll('.fpill').forEach(b => b.classList.remove('on'))
   btn.classList.add('on')
-  loadAndRender()
+  loadGrid()
 }
-
 function handleSearch(v) {
-  searchQuery = v.trim()
-  currentPage = 1
+  q = v.trim(); page = 1
   clearTimeout(handleSearch._t)
-  handleSearch._t = setTimeout(loadAndRender, 350)
+  handleSearch._t = setTimeout(loadGrid, 350)
 }
-
 function changePage(dir) {
-  const totalPages = Math.ceil(totalCount / PER_PAGE)
-  currentPage = Math.max(1, Math.min(totalPages, currentPage + dir))
-  loadAndRender()
-  window.scrollTo({ top: 0, behavior: 'smooth' })
+  const pages = Math.ceil(total/PER_PAGE)
+  page = Math.max(1, Math.min(pages, page+dir))
+  loadGrid()
+  window.scrollTo({top:0, behavior:'smooth'})
 }
 
-// ── CLICK TRACKING ────────────────────────
-async function handleJoinClick(e, communityId) {
+// ── CLICK TRACKING ──
+async function trackClick(e, id) {
   e.stopPropagation()
   try {
     const sid = sessionStorage.getItem('cc_sid') || crypto.randomUUID()
     sessionStorage.setItem('cc_sid', sid)
     await db.from('community_clicks').insert({
-      community_id: communityId,
+      community_id: id,
       session_id: sid,
       referrer: document.referrer || null,
       user_agent: navigator.userAgent
     })
-    await db.rpc('increment_click', { community_id: communityId })
-  } catch (_) { /* non-blocking */ }
+    await db.rpc('increment_click', { community_id: id })
+  } catch(_) {}
 }
 
-// ── DETAIL MODAL ──────────────────────────
+// ── DETAIL MODAL ──
 async function openDetail(id) {
   const { data: c } = await db
     .from('communities')
     .select('*, categories(name,slug,emoji,color_bg,color_text)')
-    .eq('id', id)
-    .single()
+    .eq('id', id).single()
   if (!c) return
-
-  const cat = c.categories || {}
-  document.getElementById('dm-banner').style.background = cat.color_bg || '#1a1a1a'
-  document.getElementById('dm-emoji').textContent = cat.emoji || '💬'
+  const ct = c.categories || {}
+  document.getElementById('dm-banner').style.background = ct.color_bg || '#1a1a1a'
+  document.getElementById('dm-emoji').textContent = ct.emoji || '💬'
   document.getElementById('dm-name').textContent = c.name
   document.getElementById('dm-verified').style.display = c.is_verified ? 'flex' : 'none'
+  const isNew = Date.now() - new Date(c.created_at) < 7*24*60*60*1000
   document.getElementById('dm-tags').innerHTML =
-    `<span class="detail-tag" style="background:${cat.color_bg||'#1a1a1a'};color:${cat.color_text||'#888'}">${escHtml(cat.name||'')}</span>` +
-    (isRecent(c.created_at) ? '<span class="detail-new">new</span>' : '')
+    `<span class="detail-tag" style="background:${ct.color_bg||'#1a1a1a'};color:${ct.color_text||'#888'}">${esc(ct.name||'')}</span>` +
+    (isNew ? '<span class="detail-new">new</span>' : '')
   document.getElementById('dm-desc').textContent = c.description || ''
   document.getElementById('dm-meta').innerHTML = `
-    <div class="detail-meta-item"><i class="ti ti-brand-whatsapp"></i>WhatsApp community</div>
+    <div class="detail-meta-item"><i class="ti ti-brand-whatsapp"></i>WhatsApp</div>
     <div class="detail-meta-item"><i class="ti ti-world"></i>online &amp; offline</div>
-    <div class="detail-meta-item"><i class="ti ti-tag"></i>${escHtml(cat.name||'')}</div>`
-  const joinBtn = document.getElementById('dm-join-btn')
-  joinBtn.href = c.whatsapp_link
-  joinBtn.onclick = () => handleJoinClick(event, c.id)
-
+    <div class="detail-meta-item"><i class="ti ti-tag"></i>${esc(ct.name||'')}</div>`
+  const btn = document.getElementById('dm-join-btn')
+  btn.href = c.whatsapp_link
+  btn.onclick = (e) => trackClick(e, c.id)
   document.getElementById('detail-overlay').classList.add('open')
   document.body.style.overflow = 'hidden'
 }
-
 function closeDetail() {
   document.getElementById('detail-overlay').classList.remove('open')
   document.body.style.overflow = ''
@@ -581,7 +778,7 @@ function closeDetailOutside(e) {
   if (e.target === document.getElementById('detail-overlay')) closeDetail()
 }
 
-// ── SUBMIT MODAL ──────────────────────────
+// ── SUBMIT MODAL ──
 function openModal() {
   document.getElementById('overlay').classList.add('open')
   document.body.style.overflow = 'hidden'
@@ -593,32 +790,25 @@ function closeModal() {
 function closeModalOutside(e) {
   if (e.target === document.getElementById('overlay')) closeModal()
 }
-function selCat(btn, cat) {
-  document.querySelectorAll('.cpill').forEach(b => b.classList.remove('sel'))
-  btn.classList.add('sel')
-  selectedCat = cat
-}
 
 async function submitForm() {
-  const link = document.getElementById('f-link').value.trim()
-  const name = document.getElementById('f-name').value.trim()
-  const desc = document.getElementById('f-desc').value.trim()
+  const link  = document.getElementById('f-link').value.trim()
+  const name  = document.getElementById('f-name').value.trim()
+  const desc  = document.getElementById('f-desc').value.trim()
+  const email = document.getElementById('f-email').value.trim()
 
-  if (!link || !name || !desc || !selectedCat) {
-    showToast('please fill in all fields and pick a category.', true); return
+  if (!link || !name || !desc || !selCatSlug) {
+    toast('please fill in all fields and pick a category.', true); return
   }
   if (!link.includes('chat.whatsapp.com')) {
-    showToast('please enter a valid WhatsApp link (chat.whatsapp.com/…)', true); return
+    toast('please enter a valid WhatsApp link (chat.whatsapp.com/…)', true); return
   }
 
-  // check for duplicate whatsapp link
-  const { data: existing } = await db
-    .from('communities')
-    .select('id')
-    .eq('whatsapp_link', link)
-    .limit(1)
-  if (existing && existing.length > 0) {
-    showToast('this community is already listed!', true); return
+  // ── duplicate check ──
+  const { data: dup } = await db.from('communities')
+    .select('id').eq('whatsapp_link', link).limit(1)
+  if (dup && dup.length > 0) {
+    toast('this community is already listed!', true); return
   }
 
   const btn = document.getElementById('submit-btn')
@@ -626,31 +816,28 @@ async function submitForm() {
   btn.innerHTML = '<i class="ti ti-loader-2" style="animation:spin 1s linear infinite"></i> submitting…'
 
   try {
-    // get category id
-    const catMatch = categories.find(c => c.slug === selectedCat)
-
+    const catMatch = cats.find(c => c.slug === selCatSlug)
     const { error } = await db.from('communities').insert({
       name,
       description: desc,
       whatsapp_link: link,
       category_id: catMatch?.id || null,
-      status: 'active',
-      submitted_by_email: document.getElementById('f-email').value.trim() || null
+      submitted_by_email: email || null,
+      status: 'active'   // goes live immediately
     })
-
     if (error) throw error
 
     closeModal()
-    showToast('submitted! we review within 24h and add it live.')
-    // reset form
-    document.getElementById('f-link').value = ''
-    document.getElementById('f-name').value = ''
-    document.getElementById('f-desc').value = ''
-    document.getElementById('f-email').value = ''
-    document.querySelectorAll('.cpill').forEach(b => b.classList.remove('sel'))
-    selectedCat = ''
-  } catch (err) {
-    showToast('something went wrong — please try again.', true)
+    toast('🎉 community added! it\'s live now.')
+    resetForm()
+    page = 1; filter = 'all'; cat = 'all'
+    document.querySelectorAll('.fpill').forEach(b=>b.classList.remove('on'))
+    document.querySelectorAll('.fpill')[0].classList.add('on')
+    document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('active'))
+    document.querySelectorAll('.cat-btn')[0].classList.add('active')
+    loadGrid()
+  } catch(err) {
+    toast('something went wrong — please try again.', true)
     console.error(err)
   } finally {
     btn.disabled = false
@@ -658,31 +845,34 @@ async function submitForm() {
   }
 }
 
-// ── HELPERS ───────────────────────────────
-function showToast(msg, isError = false) {
-  const toast = document.getElementById('toast')
+function resetForm() {
+  ['f-link','f-name','f-desc','f-email'].forEach(id => {
+    document.getElementById(id).value = ''
+  })
+  document.querySelectorAll('.cpill').forEach(b => b.classList.remove('sel'))
+  selCatSlug = ''
+}
+
+// ── HELPERS ──
+function toast(msg, isErr=false) {
+  const el = document.getElementById('toast')
   document.getElementById('toast-msg').textContent = msg
-  toast.className = 'toast' + (isError ? ' error' : '')
-  toast.querySelector('i').className = isError ? 'ti ti-alert-circle' : 'ti ti-circle-check'
-  toast.classList.add('show')
-  setTimeout(() => toast.classList.remove('show'), 4000)
+  el.className = 'toast' + (isErr ? ' error' : '')
+  el.querySelector('i').className = isErr ? 'ti ti-alert-circle' : 'ti ti-circle-check'
+  el.classList.add('show')
+  setTimeout(() => el.classList.remove('show'), 4000)
+}
+function esc(s) {
+  return String(s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;')
 }
 
-function escHtml(str) {
-  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')
-}
+// spinner CSS
+const st = document.createElement('style')
+st.textContent = '@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}'
+document.head.appendChild(st)
 
-function isRecent(dateStr) {
-  if (!dateStr) return false
-  return Date.now() - new Date(dateStr).getTime() < 7 * 24 * 60 * 60 * 1000
-}
-
-// CSS for loading spinner
-const style = document.createElement('style')
-style.textContent = '@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}'
-document.head.appendChild(style)
-
-// ── START ─────────────────────────────────
 init()
 </script>
 </body>
