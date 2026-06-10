@@ -293,6 +293,11 @@ button{cursor:pointer;font-family:inherit}
       <textarea id="f-desc" rows="3" placeholder="what is this community about? who should join?"></textarea>
     </div>
     <div class="field">
+      <label>YOUR EMAIL</label>
+      <input type="email" id="f-email" placeholder="you@example.com"/>
+      <div class="field-hint">we'll notify you once your community is live</div>
+    </div>
+    <div class="field">
       <label>CATEGORY</label>
       <div class="cat-pills-select" id="cat-pills-form"></div>
     </div>
@@ -315,8 +320,8 @@ button{cursor:pointer;font-family:inherit}
 // ─────────────────────────────────────────
 // CONFIGURATION — replace these two values
 // ─────────────────────────────────────────
-const SUPABASE_URL  = 'https://vcfrezqaagrmgxrtmvwg.supabase.co'
-const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZjZnJlenFhYWdybWd4cnRtdndnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEwNTgzNzgsImV4cCI6MjA5NjYzNDM3OH0.CL-i8tus0pjAKnPNZSm5D1V7Q3va6mwIFOfPQwC3EdY'  // paste full key
+const SUPABASE_URL  = 'YOUR_SUPABASE_URL'   // e.g. https://abcdef.supabase.co
+const SUPABASE_ANON = 'YOUR_SUPABASE_ANON_KEY'
 // ─────────────────────────────────────────
 
 const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON)
@@ -606,6 +611,16 @@ async function submitForm() {
     showToast('please enter a valid WhatsApp link (chat.whatsapp.com/…)', true); return
   }
 
+  // check for duplicate whatsapp link
+  const { data: existing } = await db
+    .from('communities')
+    .select('id')
+    .eq('whatsapp_link', link)
+    .limit(1)
+  if (existing && existing.length > 0) {
+    showToast('this community is already listed!', true); return
+  }
+
   const btn = document.getElementById('submit-btn')
   btn.disabled = true
   btn.innerHTML = '<i class="ti ti-loader-2" style="animation:spin 1s linear infinite"></i> submitting…'
@@ -619,7 +634,8 @@ async function submitForm() {
       description: desc,
       whatsapp_link: link,
       category_id: catMatch?.id || null,
-      status: 'pending'
+      status: 'active',
+      submitted_by_email: document.getElementById('f-email').value.trim() || null
     })
 
     if (error) throw error
@@ -630,6 +646,7 @@ async function submitForm() {
     document.getElementById('f-link').value = ''
     document.getElementById('f-name').value = ''
     document.getElementById('f-desc').value = ''
+    document.getElementById('f-email').value = ''
     document.querySelectorAll('.cpill').forEach(b => b.classList.remove('sel'))
     selectedCat = ''
   } catch (err) {
