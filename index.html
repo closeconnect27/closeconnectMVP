@@ -63,7 +63,7 @@ button{cursor:pointer;font-family:inherit}
 .add-btn i{font-size:15px}
 
 /* ── HERO ── */
-.hero{padding:48px 32px 0;max-width:1140px;margin:0 auto}
+.hero{padding:48px 32px 0;max-width:1600px;margin:0 auto}
 .hero h1{
   font-family:'Syne',sans-serif;
   font-size:clamp(32px,4.5vw,52px);
@@ -78,13 +78,14 @@ button{cursor:pointer;font-family:inherit}
 
 /* ── LAYOUT ── */
 .layout{
-  display:grid;grid-template-columns:220px 1fr;
-  gap:32px;max-width:1140px;margin:0 auto;
+  display:grid;grid-template-columns:200px 1fr;
+  gap:28px;max-width:1600px;margin:0 auto;
   padding:28px 32px 80px;
 }
 
 /* ── SIDEBAR ── */
-.sidebar{display:flex;flex-direction:column;gap:4px}
+.sidebar{display:flex;flex-direction:column;gap:4px;position:sticky;top:80px;max-height:calc(100vh - 100px);overflow-y:auto;scrollbar-width:none}
+.sidebar::-webkit-scrollbar{display:none}
 .sidebar-label{
   font-size:10px;font-weight:700;color:var(--text3);
   letter-spacing:.7px;padding:0 12px;
@@ -127,7 +128,7 @@ button{cursor:pointer;font-family:inherit}
 /* ── GRID ── */
 .grid{
   display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(230px,1fr));
+  grid-template-columns:repeat(auto-fill,minmax(210px,1fr));
   gap:14px;margin-bottom:28px;
 }
 
@@ -518,13 +519,14 @@ button{cursor:pointer;font-family:inherit}
       <input type="text" id="f-name" placeholder="e.g. Weekend Runners Bengaluru"/>
     </div>
     <div class="field">
+      <label>YOUR NAME</label>
+      <input type="text" id="f-creator" placeholder="e.g. Srikeerthi"/>
+    </div>
+    <div class="field">
       <label>ABOUT THIS COMMUNITY</label>
       <textarea id="f-desc" rows="3" placeholder="what is this community about? who should join?"></textarea>
     </div>
-    <div class="field">
-      <label>YOUR EMAIL <span style="color:var(--text3);font-weight:400;font-size:10px">(optional — we'll notify you when it goes live)</span></label>
-      <input type="email" id="f-email" placeholder="you@example.com"/>
-    </div>
+
     <div class="field">
       <label>CATEGORY</label>
       <div class="cat-pills-select" id="cat-pills-form"></div>
@@ -546,7 +548,7 @@ button{cursor:pointer;font-family:inherit}
 
 <script>
 // ── CONFIG — fill in your Supabase values ──
-const SUPABASE_URL  = 'https://vcfrezqaagrmgxrtmvwg.supabase.co'
+const SUPABASE_URL  = 'https://vcfrezqaagrmgxrtmvwg.supabase.co'
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZjZnJlenFhYWdybWd4cnRtdndnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEwNTgzNzgsImV4cCI6MjA5NjYzNDM3OH0.CL-i8tus0pjAKnPNZSm5D1V7Q3va6mwIFOfPQwC3EdY'
 // ──────────────────────────────────────────
 
@@ -602,6 +604,17 @@ function buildCatPills() {
     }
     wrap.appendChild(btn)
   })
+  // other option
+  const other = document.createElement('button')
+  other.type = 'button'
+  other.className = 'cpill'
+  other.textContent = '+ other'
+  other.onclick = () => {
+    wrap.querySelectorAll('.cpill').forEach(b => b.classList.remove('sel'))
+    other.classList.add('sel')
+    selCatSlug = 'other'
+  }
+  wrap.appendChild(other)
 }
 
 // ── LOAD GRID ──
@@ -792,10 +805,12 @@ function closeModalOutside(e) {
 }
 
 async function submitForm() {
-  const link  = document.getElementById('f-link').value.trim()
-  const name  = document.getElementById('f-name').value.trim()
-  const desc  = document.getElementById('f-desc').value.trim()
-  const email = document.getElementById('f-email').value.trim()
+  const link    = document.getElementById('f-link').value.trim()
+  const name    = document.getElementById('f-name').value.trim()
+  const desc    = document.getElementById('f-desc').value.trim()
+  const creator = document.getElementById('f-creator').value.trim()
+  // capture email from browser autofill if available (not shown to user)
+  const email   = navigator.userAgent // placeholder — replace with real auth later
 
   if (!link || !name || !desc || !selCatSlug) {
     toast('please fill in all fields and pick a category.', true); return
@@ -816,13 +831,14 @@ async function submitForm() {
   btn.innerHTML = '<i class="ti ti-loader-2" style="animation:spin 1s linear infinite"></i> submitting…'
 
   try {
-    const catMatch = cats.find(c => c.slug === selCatSlug)
+    const catMatch = selCatSlug === 'other' ? null : cats.find(c => c.slug === selCatSlug)
     const { error } = await db.from('communities').insert({
       name,
       description: desc,
       whatsapp_link: link,
-      category_id: catMatch?.id || null,
-      submitted_by_email: email || null,
+      category_id: catMatch ? catMatch.id : null,
+      submitted_by_name: creator || null,
+      submitted_by_email: null,
       status: 'active'   // goes live immediately
     })
     if (error) throw error
@@ -846,7 +862,7 @@ async function submitForm() {
 }
 
 function resetForm() {
-  ['f-link','f-name','f-desc','f-email'].forEach(id => {
+  ['f-link','f-name','f-desc','f-creator'].forEach(id => {
     document.getElementById(id).value = ''
   })
   document.querySelectorAll('.cpill').forEach(b => b.classList.remove('sel'))
