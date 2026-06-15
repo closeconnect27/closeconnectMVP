@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Close.Connect — find your community</title>
+<title>close.connect — find your community</title>
 <meta name="description" content="Browse WhatsApp communities by interest. Discover groups that match your vibe and join in one tap."/>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css"/>
@@ -498,6 +498,44 @@ button{cursor:pointer;font-family:inherit}
 .empty p{font-size:15px;color:var(--text2);font-weight:500}
 .empty small{font-size:13px;color:var(--text3)}
 
+/* ── CHAR COUNTER ── */
+#desc-count{font-size:11px;color:var(--text3)}
+#desc-count.warn{color:var(--orange)}
+/* ── REPORT BTN ── */
+.report-btn{
+  display:flex;align-items:center;gap:4px;
+  background:none;border:none;color:var(--text3);
+  font-size:11px;cursor:pointer;margin-top:10px;
+  font-family:inherit;padding:4px 0;
+  transition:color .12s;
+}
+.report-btn:hover{color:var(--pink)}
+.report-btn i{font-size:13px}
+/* ── REPORT MODAL ── */
+.report-modal{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:16px;width:100%;max-width:420px;
+  padding:24px;animation:modalIn .2s ease both;
+  box-shadow:0 20px 60px rgba(0,0,0,.15);
+}
+.report-options{display:flex;flex-direction:column;gap:8px;margin:14px 0}
+.report-option{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 14px;border-radius:var(--radius-sm);
+  border:1.5px solid var(--border);background:var(--surface);
+  color:var(--text2);font-size:13px;cursor:pointer;
+  font-family:inherit;text-align:left;transition:all .12s;
+}
+.report-option:hover{border-color:var(--pink);color:var(--pink);background:var(--pink-light)}
+.report-option.sel{border-color:var(--pink);color:var(--pink);background:var(--pink-light)}
+.btn-report-submit{
+  width:100%;padding:12px 0;border-radius:999px;
+  border:none;background:var(--pink);color:#fff;
+  font-size:13px;font-weight:700;transition:background .15s;
+  margin-top:4px;
+}
+.btn-report-submit:hover{background:#ad1457}
+.btn-report-submit:disabled{opacity:.5;cursor:not-allowed}
 /* ── RESPONSIVE ── */
 @media(max-width:800px){
   .layout{grid-template-columns:1fr}
@@ -538,7 +576,7 @@ button{cursor:pointer;font-family:inherit}
 <!-- HERO -->
 <div class="hero">
   <h1>find your <em>people</em><br/>wherever you are</h1>
-  <p>Browse WhatsApp communities by interest. Discover groups that match your vibe and join in one tap.</p>
+  <p>Browse WhatsApp communities by interest. Online or offline — discover groups that match your vibe and join in one tap.</p>
 </div>
 
 <!-- LAYOUT -->
@@ -604,6 +642,9 @@ button{cursor:pointer;font-family:inherit}
         <i class="ti ti-brand-whatsapp"></i>join on WhatsApp
       </a>
       <div class="detail-hint">opens WhatsApp — free to join</div>
+      <div style="text-align:center;margin-top:6px">
+        <button class="report-btn" id="report-trigger"><i class="ti ti-flag"></i>report this community</button>
+      </div>
     </div>
   </div>
 </div>
@@ -622,21 +663,22 @@ button{cursor:pointer;font-family:inherit}
       <label>WhatsApp Community Link</label>
       <div class="wa-input-wrap">
         <i class="ti ti-brand-whatsapp wa-prefix"></i>
-        <input type="url" id="f-link" placeholder="https://chat.whatsapp.com/…"/>
+        <input type="url" id="f-link" placeholder="https://chat.whatsapp.com/…" maxlength="200" autocomplete="off"/>
       </div>
       <div class="field-hint">WhatsApp → Community info → Invite via link</div>
     </div>
     <div class="field">
       <label>Community Name</label>
-      <input type="text" id="f-name" placeholder="e.g. Weekend Runners Bengaluru"/>
+      <input type="text" id="f-name" placeholder="e.g. Weekend Runners Bengaluru" maxlength="100"/>
     </div>
     <div class="field">
       <label>Your Name</label>
-      <input type="text" id="f-creator" placeholder="e.g. Srikeerthi"/>
+      <input type="text" id="f-creator" placeholder="e.g. Srikeerthi" maxlength="60"/>
     </div>
     <div class="field">
       <label>About This Community</label>
-      <textarea id="f-desc" rows="3" placeholder="what is this community about? who should join?"></textarea>
+      <textarea id="f-desc" rows="3" placeholder="what is this community about? who should join?" maxlength="500"></textarea>
+      <div class="field-hint" id="desc-count" style="text-align:right;margin-top:4px">0 / 500</div>
     </div>
     <div class="field">
       <label>Category</label>
@@ -651,6 +693,32 @@ button{cursor:pointer;font-family:inherit}
   </div>
 </div>
 
+<!-- REPORT MODAL -->
+<div class="overlay" id="report-overlay" onclick="closeReportOutside(event)">
+  <div class="report-modal">
+    <div class="modal-header" style="margin-bottom:8px">
+      <div>
+        <div class="modal-title" style="font-size:17px">report community</div>
+        <div class="modal-sub">help us keep the directory clean</div>
+      </div>
+      <button class="modal-close" onclick="closeReport()"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="report-options" id="report-options">
+      <button class="report-option" onclick="selReport(this,'dead_link')"><i class="ti ti-link-off" style="font-size:16px"></i>link no longer works</button>
+      <button class="report-option" onclick="selReport(this,'spam')"><i class="ti ti-alert-triangle" style="font-size:16px"></i>spam or fake community</button>
+      <button class="report-option" onclick="selReport(this,'inappropriate')"><i class="ti ti-ban" style="font-size:16px"></i>inappropriate content</button>
+      <button class="report-option" onclick="selReport(this,'duplicate')"><i class="ti ti-copy" style="font-size:16px"></i>duplicate listing</button>
+    </div>
+    <button class="btn-report-submit" id="report-submit-btn" onclick="submitReport()" disabled>submit report</button>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer style="border-top:1px solid var(--border);padding:24px 32px;max-width:1600px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+  <span style="font-family:'Syne',sans-serif;font-weight:800;font-size:16px;color:var(--text)">close<span style="color:var(--green)">.</span>connect</span>
+  <span style="font-size:13px;color:var(--text3)">queries or concerns? <a href="mailto:closeconnect27@gmail.com" style="color:var(--green);font-weight:600;text-decoration:none">closeconnect27@gmail.com</a></span>
+</footer>
+
 <!-- TOAST -->
 <div class="toast" id="toast">
   <i class="ti ti-circle-check"></i>
@@ -660,8 +728,8 @@ button{cursor:pointer;font-family:inherit}
 
 <script>
 // ── CONFIG — fill in your Supabase values ──
-const SUPABASE_URL  = 'https://vcfrezqaagrmgxrtmvwg.supabase.co'
-const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZjZnJlenFhYWdybWd4cnRtdndnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEwNTgzNzgsImV4cCI6MjA5NjYzNDM3OH0.CL-i8tus0pjAKnPNZSm5D1V7Q3va6mwIFOfPQwC3EdY'
+const SUPABASE_URL  = 'PASTE_YOUR_SUPABASE_URL_HERE'
+const SUPABASE_ANON = 'PASTE_YOUR_SUPABASE_ANON_KEY_HERE'
 // ──────────────────────────────────────────
 
 const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON)
@@ -787,7 +855,7 @@ function renderGrid(list) {
       <div class="card-desc">${esc(c.description||'')}</div>
       <div class="card-footer">
         <span class="card-cat-label"><i class="ti ti-tag"></i>${esc(ct.name||'')}</span>
-        <a href="${esc(c.whatsapp_link)}" target="_blank" rel="noopener"
+        <a href="${safeJoinHref(c.whatsapp_link)}" target="_blank" rel="noopener noreferrer"
            class="wa-btn" onclick="trackClick(event,'${c.id}')">
           <i class="ti ti-brand-whatsapp"></i>join
         </a>
@@ -889,8 +957,9 @@ async function openDetail(id) {
     <div class="detail-meta-item"><i class="ti ti-brand-whatsapp"></i>WhatsApp</div>
     <div class="detail-meta-item"><i class="ti ti-world"></i>online &amp; offline</div>
     <div class="detail-meta-item"><i class="ti ti-tag"></i>${esc(ct.name||'')}</div>`
+  reportingCommunityId = c.id
   const btn = document.getElementById('dm-join-btn')
-  btn.href = c.whatsapp_link
+  btn.href = safeJoinHref(c.whatsapp_link)
   btn.onclick = (e) => trackClick(e, c.id)
   document.getElementById('detail-overlay').classList.add('open')
   document.body.style.overflow = 'hidden'
@@ -916,22 +985,68 @@ function closeModalOutside(e) {
   if (e.target === document.getElementById('overlay')) closeModal()
 }
 
-async function submitForm() {
-  const link    = document.getElementById('f-link').value.trim()
-  const name    = document.getElementById('f-name').value.trim()
-  const desc    = document.getElementById('f-desc').value.trim()
-  const creator = document.getElementById('f-creator').value.trim()
-  // capture email from browser autofill if available (not shown to user)
-  const email   = navigator.userAgent // placeholder — replace with real auth later
+// ── SUBMIT RATE LIMIT (max 3 submissions per session) ──
+function checkRateLimit() {
+  const key = 'cc_submits'
+  const data = JSON.parse(sessionStorage.getItem(key) || '{"count":0,"reset":0}')
+  const now = Date.now()
+  if (now > data.reset) { data.count = 0; data.reset = now + 60*60*1000 }
+  if (data.count >= 3) return false
+  data.count++
+  sessionStorage.setItem(key, JSON.stringify(data))
+  return true
+}
 
-  if (!link || !name || !desc || !selCatSlug) {
+// ── STRICT WHATSAPP URL VALIDATOR ──
+function isValidWaLink(url) {
+  try {
+    const u = new URL(url)
+    return u.protocol === 'https:' &&
+           u.hostname === 'chat.whatsapp.com' &&
+           u.pathname.length > 1 &&
+           /^\/[A-Za-z0-9_-]{10,}$/.test(u.pathname)
+  } catch { return false }
+}
+
+// ── SANITISE TEXT (strip HTML tags) ──
+function sanitise(s, max) {
+  return String(s).replace(/<[^>]*>/g,'').replace(/[<>"']/g,'').trim().slice(0, max)
+}
+
+async function submitForm() {
+  const rawLink    = document.getElementById('f-link').value.trim()
+  const rawName    = document.getElementById('f-name').value.trim()
+  const rawDesc    = document.getElementById('f-desc').value.trim()
+  const rawCreator = document.getElementById('f-creator').value.trim()
+
+  // ── 1. required fields ──
+  if (!rawLink || !rawName || !rawDesc || !selCatSlug) {
     toast('please fill in all fields and pick a category.', true); return
   }
-  if (!link.includes('chat.whatsapp.com')) {
-    toast('please enter a valid WhatsApp link (chat.whatsapp.com/…)', true); return
+
+  // ── 2. strict WhatsApp URL check ──
+  if (!isValidWaLink(rawLink)) {
+    toast('please enter a valid WhatsApp community link.', true); return
   }
 
-  // ── duplicate check ──
+  // ── 3. length checks ──
+  if (rawName.length < 3)  { toast('community name must be at least 3 characters.', true); return }
+  if (rawName.length > 100){ toast('community name must be under 100 characters.', true); return }
+  if (rawDesc.length < 10) { toast('please write at least 10 characters about this community.', true); return }
+  if (rawDesc.length > 500){ toast('description must be under 500 characters.', true); return }
+
+  // ── 4. session rate limit ──
+  if (!checkRateLimit()) {
+    toast('too many submissions — please try again later.', true); return
+  }
+
+  // ── 5. sanitise inputs ──
+  const link    = rawLink
+  const name    = sanitise(rawName, 100)
+  const desc    = sanitise(rawDesc, 500)
+  const creator = sanitise(rawCreator, 60)
+
+  // ── 6. duplicate check ──
   const { data: dup } = await db.from('communities')
     .select('id').eq('whatsapp_link', link).limit(1)
   if (dup && dup.length > 0) {
@@ -951,9 +1066,19 @@ async function submitForm() {
       category_id: catMatch ? catMatch.id : null,
       submitted_by_name: creator || null,
       submitted_by_email: null,
-      status: 'active'   // goes live immediately
+      status: 'active'
     })
-    if (error) throw error
+    if (error) {
+      // DB constraint violation — bad link or length
+      if (error.code === '23514') {
+        toast('invalid WhatsApp link — only chat.whatsapp.com links allowed.', true)
+      } else if (error.code === '23505') {
+        toast('this community is already listed!', true)
+      } else {
+        throw error
+      }
+      return
+    }
 
     closeModal()
     toast('🎉 community added! it\'s live now.')
@@ -972,6 +1097,14 @@ async function submitForm() {
     btn.innerHTML = '<i class="ti ti-brand-whatsapp"></i> submit community'
   }
 }
+
+// ── CHAR COUNTER ──
+document.getElementById('f-desc').addEventListener('input', function() {
+  const len = this.value.length
+  const el = document.getElementById('desc-count')
+  el.textContent = len + ' / 500'
+  el.className = 'field-hint' + (len > 450 ? ' warn' : '')
+})
 
 function resetForm() {
   ['f-link','f-name','f-desc','f-creator'].forEach(id => {
@@ -994,6 +1127,64 @@ function esc(s) {
   return String(s)
     .replace(/&/g,'&amp;').replace(/</g,'&lt;')
     .replace(/>/g,'&gt;').replace(/"/g,'&quot;')
+}
+
+// ── REPORT MODAL ──
+let reportingCommunityId = null
+let selectedReason = null
+
+document.getElementById('report-trigger').addEventListener('click', () => {
+  if (!reportingCommunityId) return
+  selectedReason = null
+  document.querySelectorAll('.report-option').forEach(b => b.classList.remove('sel'))
+  document.getElementById('report-submit-btn').disabled = true
+  document.getElementById('report-overlay').classList.add('open')
+})
+
+function selReport(btn, reason) {
+  selectedReason = reason
+  document.querySelectorAll('.report-option').forEach(b => b.classList.remove('sel'))
+  btn.classList.add('sel')
+  document.getElementById('report-submit-btn').disabled = false
+}
+
+function closeReport() {
+  document.getElementById('report-overlay').classList.remove('open')
+}
+
+function closeReportOutside(e) {
+  if (e.target === document.getElementById('report-overlay')) closeReport()
+}
+
+async function submitReport() {
+  if (!reportingCommunityId || !selectedReason) return
+  const btn = document.getElementById('report-submit-btn')
+  btn.disabled = true
+  btn.textContent = 'submitting…'
+  try {
+    await db.from('reports').insert({
+      community_id: reportingCommunityId,
+      reason: selectedReason,
+      status: 'open'
+    })
+    closeReport()
+    closeDetail()
+    toast('thanks for reporting — we\'ll review it shortly.')
+  } catch(err) {
+    toast('could not submit report — try again.', true)
+  } finally {
+    btn.disabled = false
+    btn.textContent = 'submit report'
+  }
+}
+
+// ── SAFE JOIN LINK (prevent non-whatsapp href) ──
+function safeJoinHref(url) {
+  try {
+    const u = new URL(url)
+    if (u.protocol === 'https:' && u.hostname === 'chat.whatsapp.com') return url
+  } catch {}
+  return '#'
 }
 
 // spinner CSS
