@@ -742,7 +742,10 @@ let cats = [], total = 0
 const CAT_ICONS = {
   sports:'ti-run', tech:'ti-code', arts:'ti-palette',
   food:'ti-coffee', music:'ti-music', wellness:'ti-heart',
-  gaming:'ti-device-gamepad-2', travel:'ti-plane', photography:'ti-camera'
+  gaming:'ti-device-gamepad-2', travel:'ti-plane', photography:'ti-camera',
+  social:'ti-confetti', books:'ti-book', pets:'ti-paw',
+  parenting:'ti-baby-carriage', education:'ti-school', finance:'ti-coin',
+  other:'ti-dots'
 }
 
 // ── INIT ──
@@ -784,17 +787,7 @@ function buildCatPills() {
     }
     wrap.appendChild(btn)
   })
-  // other option
-  const other = document.createElement('button')
-  other.type = 'button'
-  other.className = 'cpill'
-  other.textContent = '+ other'
-  other.onclick = () => {
-    wrap.querySelectorAll('.cpill').forEach(b => b.classList.remove('sel'))
-    other.classList.add('sel')
-    selCatSlug = 'other'
-  }
-  wrap.appendChild(other)
+  
 }
 
 // ── LOAD GRID ──
@@ -1058,7 +1051,7 @@ async function submitForm() {
   btn.innerHTML = '<i class="ti ti-loader-2" style="animation:spin 1s linear infinite"></i> submitting…'
 
   try {
-    const catMatch = selCatSlug === 'other' ? null : cats.find(c => c.slug === selCatSlug)
+    const catMatch = cats.find(c => c.slug === selCatSlug)
     const { error } = await db.from('communities').insert({
       name,
       description: desc,
