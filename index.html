@@ -185,7 +185,7 @@ button{cursor:pointer;font-family:inherit}
 /* ── GRID ── */
 .grid{
   display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(200px,1fr));
+  grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
   gap:16px;margin-bottom:28px;
 }
 
@@ -197,14 +197,16 @@ button{cursor:pointer;font-family:inherit}
   padding:18px;
   display:flex;flex-direction:column;gap:12px;
   transition:border-color .15s,transform .15s,box-shadow .15s;
-  position:relative;overflow:hidden;cursor:pointer;
+  position:relative;overflow:visible;cursor:pointer;
   box-shadow:var(--shadow);
+  min-width:0;
 }
 .card:hover{
   border-color:var(--border2);
   transform:translateY(-3px);
   box-shadow:var(--shadow-md);
 }
+.card .verified-dot{position:absolute;top:14px;right:14px;clip-path:none}
 .card-top{display:flex;align-items:flex-start;gap:12px}
 .card-icon{
   width:48px;height:48px;border-radius:12px;
@@ -236,11 +238,12 @@ button{cursor:pointer;font-family:inherit}
   justify-content:space-between;
   padding-top:10px;
   border-top:1px solid var(--border);gap:8px;
-  margin-top:auto;
+  margin-top:auto;flex-wrap:wrap;
 }
 .card-cat-label{
   font-size:12px;color:var(--text3);
   display:flex;align-items:center;gap:4px;font-weight:500;
+  flex-wrap:wrap;min-width:0;flex:1;
 }
 .card-cat-label i{font-size:12px}
 .wa-btn{
@@ -250,7 +253,7 @@ button{cursor:pointer;font-family:inherit}
   border:1.5px solid rgba(37,211,102,.3);
   border-radius:999px;color:var(--green);
   font-size:12px;font-weight:700;
-  transition:all .15s;
+  transition:all .15s;flex-shrink:0;
 }
 .wa-btn:hover{
   background:#d4f5e3;
@@ -440,19 +443,7 @@ button{cursor:pointer;font-family:inherit}
 }
 .wa-input-wrap input{padding-left:40px}
 .field-hint{font-size:11px;color:var(--text3);margin-top:6px;line-height:1.5}
-.cat-pills-select{display:flex;flex-wrap:wrap;gap:7px}
-.cpill{
-  padding:7px 15px;border-radius:999px;
-  border:1.5px solid var(--border2);
-  background:var(--surface);color:var(--text2);
-  font-size:13px;font-weight:500;transition:all .12s;
-}
-.cpill.sel{
-  background:var(--green-light);
-  border-color:var(--green);
-  color:var(--green);font-weight:600;
-}
-.cpill:hover:not(.sel){border-color:var(--text3);color:var(--text);background:var(--surface2)}
+/* category pills removed — using select dropdown */
 .modal-btns{display:flex;gap:10px;margin-top:24px}
 .btn-cancel{
   flex:1;padding:13px 0;border-radius:999px;
@@ -860,7 +851,9 @@ button{cursor:pointer;font-family:inherit}
     </div>
     <div class="field">
       <label>Category</label>
-      <div class="cat-pills-select" id="cat-pills-form"></div>
+      <select id="cat-select-form" class="field" style="margin-bottom:0">
+        <option value="">select a category…</option>
+      </select>
     </div>
     <div class="modal-btns">
       <button class="btn-cancel" onclick="closeModal()">cancel</button>
@@ -924,6 +917,7 @@ const CAT_ICONS = {
   gaming:'ti-device-gamepad-2', travel:'ti-plane', photography:'ti-camera',
   social:'ti-confetti', books:'ti-book', pets:'ti-paw',
   parenting:'ti-baby-carriage', education:'ti-school', finance:'ti-coin',
+  business:'ti-briefcase', lgbtq:'ti-heart-handshake',
   other:'ti-dots'
 }
 
@@ -952,20 +946,16 @@ function buildSidebar() {
 
 // ── CAT PILLS IN FORM ──
 function buildCatPills() {
-  const wrap = document.getElementById('cat-pills-form')
-  wrap.innerHTML = ''
+  const sel = document.getElementById('cat-select-form')
+  if (!sel) return
+  sel.innerHTML = '<option value="">select a category…</option>'
   cats.forEach(c => {
-    const btn = document.createElement('button')
-    btn.type = 'button'
-    btn.className = 'cpill'
-    btn.textContent = `${c.emoji||''} ${c.name}`
-    btn.onclick = () => {
-      wrap.querySelectorAll('.cpill').forEach(b => b.classList.remove('sel'))
-      btn.classList.add('sel')
-      selCatSlug = c.slug
-    }
-    wrap.appendChild(btn)
+    const opt = document.createElement('option')
+    opt.value = c.slug
+    opt.textContent = `${c.emoji || ''} ${c.name}`.trim()
+    sel.appendChild(opt)
   })
+  sel.onchange = () => { selCatSlug = sel.value }
 }
 
 // ── LOAD GRID ──
@@ -1350,8 +1340,8 @@ function resetForm() {
   ['f-link','f-name','f-desc','f-creator','f-city','f-city-other'].forEach(id => {
     const el = document.getElementById(id); if (el) el.value = ''
   })
-  document.querySelectorAll('.cpill').forEach(b => b.classList.remove('sel'))
   document.querySelectorAll('.toggle-opt').forEach(b => b.classList.remove('sel-online','sel-offline','sel-both'))
+  const catSel = document.getElementById('cat-select-form'); if (catSel) catSel.value = ''
   selCatSlug = ''; selCommType = ''
   const cf = document.getElementById('city-field')
   if (cf) { cf.style.opacity = '1'; cf.style.pointerEvents = '' }
