@@ -1162,7 +1162,7 @@ function checkRateLimit() {
   const data = JSON.parse(sessionStorage.getItem(key) || '{"count":0,"reset":0}')
   const now = Date.now()
   if (now > data.reset) { data.count = 0; data.reset = now + 60*60*1000 }
-  if (data.count >= 3) return false
+  if (data.count >= 50) return false
   data.count++
   sessionStorage.setItem(key, JSON.stringify(data))
   return true
