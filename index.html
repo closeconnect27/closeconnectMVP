@@ -978,6 +978,13 @@ async function loadGrid() {
   if (q) query = query.or(`name.ilike.%${q}%,description.ilike.%${q}%`)
   if (filterType !== 'all') query = query.eq('community_type', filterType)
   if (filterCity) query = query.ilike('city', filterCity)
+
+  // ── category filter — DB level using category_id ──
+  if (cat !== 'all') {
+    const catObj = cats.find(c => c.slug === cat)
+    if (catObj) query = query.eq('category_id', catObj.id)
+  }
+
   if (filter === 'popular') query = query.order('click_count', { ascending: false })
   else query = query.order('created_at', { ascending: false })
   if (filter === 'new') {
@@ -989,10 +996,7 @@ async function loadGrid() {
   const { data, count } = await query
   total = count || 0
 
-  let communities = (data || [])
-  if (cat !== 'all') communities = communities.filter(c => c.categories?.slug === cat)
-
-  renderGrid(communities)
+  renderGrid(data || [])
   renderPagination()
   updateSidebarCounts()
 }
