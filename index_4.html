@@ -1,0 +1,1479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Close.Connect — Find Your Community</title>
+<meta name="description" content="Browse WhatsApp communities by interest. Discover groups that match your vibe and join in one tap."/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css"/>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{
+  --bg:#fafaf8;
+  --surface:#ffffff;
+  --surface2:#f4f3f0;
+  --border:#e8e5e0;
+  --border2:#d8d4ce;
+  --text:#1a1814;
+  --text2:#6b6560;
+  --text3:#a09890;
+  --green:#1a7a5e;
+  --green-light:#edf7f3;
+  --green-mid:#159068;
+  --pink:#c2185b;
+  --pink-light:#fce4ec;
+  --wa:#25D366;
+  --wa-dim:#e8f8ee;
+  --accent:#7c3aed;
+  --accent-light:#f3f0ff;
+  --orange:#c2500a;
+  --orange-light:#fff3ec;
+  --radius:14px;
+  --radius-sm:8px;
+  --shadow:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
+  --shadow-md:0 4px 12px rgba(0,0,0,.08),0 2px 4px rgba(0,0,0,.04);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;font-size:15px;line-height:1.5}
+a{text-decoration:none;color:inherit}
+button{cursor:pointer;font-family:inherit}
+
+/* ── HEADER ── */
+.header{
+  position:sticky;top:0;z-index:200;
+  background:rgba(255,255,255,.95);
+  backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--border);
+  padding:0 32px;height:64px;
+  display:flex;align-items:center;gap:16px;
+  box-shadow:0 1px 0 var(--border);
+}
+.logo{
+  font-family:'Syne',sans-serif;font-weight:800;font-size:20px;
+  letter-spacing:-.5px;white-space:nowrap;flex-shrink:0;
+  color:var(--text);
+}
+.logo span{color:var(--green)}
+.header-search{
+  flex:1;max-width:480px;
+  display:flex;align-items:center;
+  background:var(--surface2);
+  border:1.5px solid var(--border);
+  border-radius:999px;padding:0 16px;height:42px;gap:9px;
+  transition:border-color .15s,box-shadow .15s;
+}
+.header-search:focus-within{
+  border-color:var(--green);
+  box-shadow:0 0 0 3px rgba(26,122,94,.08);
+  background:#fff;
+}
+.header-search i{color:var(--text3);font-size:15px;flex-shrink:0}
+.header-search input{
+  background:transparent;border:none;outline:none;
+  color:var(--text);font-size:14px;font-family:inherit;width:100%;
+}
+.header-search input::placeholder{color:var(--text3)}
+.header-right{margin-left:auto;display:flex;gap:10px;align-items:center}
+.add-btn{
+  display:flex;align-items:center;gap:7px;
+  padding:0 20px;height:42px;
+  background:var(--green);border:none;border-radius:999px;
+  color:#fff;font-size:14px;font-weight:600;
+  transition:background .15s,box-shadow .15s;white-space:nowrap;
+  box-shadow:0 2px 8px rgba(26,122,94,.25);
+}
+.add-btn:hover{background:var(--green-mid);box-shadow:0 4px 14px rgba(26,122,94,.3)}
+.add-btn i{font-size:16px}
+
+/* ── HERO ── */
+.hero{
+  padding:56px 32px 0;
+  max-width:1600px;margin:0 auto;
+}
+.hero h1{
+  font-family:'Syne',sans-serif;
+  font-size:clamp(32px,4vw,52px);
+  font-weight:800;letter-spacing:-1.5px;
+  line-height:1.05;margin-bottom:12px;color:var(--text);
+}
+.hero h1 em{font-style:normal;color:var(--green)}
+.hero p{
+  font-size:16px;color:var(--text2);
+  max-width:500px;margin-bottom:36px;line-height:1.7;
+}
+
+/* ── LAYOUT ── */
+.layout{
+  display:grid;
+  grid-template-columns:230px 1fr;
+  gap:0;
+  max-width:1600px;margin:0 auto;
+  padding:0 0 80px;
+  align-items:start;
+}
+
+/* ── SIDEBAR ── */
+.sidebar-wrap{
+  padding:24px 0 24px 32px;
+  position:sticky;top:64px;
+  max-height:calc(100vh - 64px);
+  overflow-y:auto;scrollbar-width:none;
+}
+.sidebar-wrap::-webkit-scrollbar{display:none}
+.sidebar{display:flex;flex-direction:column;gap:2px}
+.sidebar-label{
+  font-size:11px;font-weight:700;color:var(--text3);
+  letter-spacing:.6px;padding:0 12px;
+  margin-bottom:8px;margin-top:16px;text-transform:uppercase;
+}
+.sidebar-label:first-child{margin-top:0}
+.cat-btn{
+  display:flex;align-items:center;gap:10px;
+  padding:9px 12px;border-radius:var(--radius-sm);
+  border:none;background:transparent;
+  color:var(--text2);font-size:13px;font-weight:500;
+  text-align:left;transition:all .12s;width:100%;
+}
+.cat-btn:hover{background:var(--surface2);color:var(--text)}
+.cat-btn.active{
+  background:var(--green-light);
+  color:var(--green);font-weight:600;
+}
+.cat-btn i{font-size:16px;flex-shrink:0;opacity:.7}
+.cat-btn.active i{opacity:1}
+.cat-count{
+  margin-left:auto;font-size:11px;font-weight:600;
+  background:var(--surface2);
+  padding:2px 8px;border-radius:999px;
+  color:var(--text3);
+}
+.cat-btn.active .cat-count{
+  background:rgba(26,122,94,.12);
+  color:var(--green);
+}
+.sidebar-divider{
+  height:1px;background:var(--border);
+  margin:12px 12px;
+}
+
+/* ── MAIN ── */
+.main-wrap{
+  padding:24px 32px 0 28px;
+  border-left:1px solid var(--border);
+  min-width:0;
+}
+.filter-row{
+  display:flex;gap:8px;flex-wrap:wrap;
+  margin-bottom:24px;align-items:center;
+}
+.filter-label{font-size:13px;color:var(--text3);margin-right:4px;font-weight:500}
+.fpill{
+  padding:6px 16px;border-radius:999px;
+  border:1.5px solid var(--border2);
+  background:var(--surface);
+  color:var(--text2);font-size:13px;font-weight:500;
+  transition:all .12s;
+}
+.fpill.on{
+  background:var(--green);border-color:var(--green);
+  color:#fff;box-shadow:0 2px 6px rgba(26,122,94,.2);
+}
+.fpill:hover:not(.on){border-color:var(--text3);color:var(--text);background:var(--surface2)}
+
+/* ── GRID ── */
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+  gap:16px;margin-bottom:28px;
+}
+
+/* ── CARD ── */
+.card{
+  background:var(--surface);
+  border:1.5px solid var(--border);
+  border-radius:var(--radius);
+  padding:18px;
+  display:flex;flex-direction:column;gap:12px;
+  transition:border-color .15s,transform .15s,box-shadow .15s;
+  position:relative;overflow:visible;cursor:pointer;
+  box-shadow:var(--shadow);
+  min-width:0;
+}
+.card:hover{
+  border-color:var(--border2);
+  transform:translateY(-3px);
+  box-shadow:var(--shadow-md);
+}
+.card .verified-dot{position:absolute;top:14px;right:14px;clip-path:none}
+.card-top{display:flex;align-items:flex-start;gap:12px}
+.card-icon{
+  width:48px;height:48px;border-radius:12px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:24px;flex-shrink:0;
+}
+.card-meta{flex:1;min-width:0}
+.card-name{
+  font-size:14px;font-weight:600;color:var(--text);
+  margin-bottom:5px;line-height:1.3;
+}
+.card-cat{
+  font-size:11px;font-weight:600;
+  padding:3px 9px;border-radius:999px;display:inline-block;
+}
+.card-new{
+  font-size:11px;font-weight:600;
+  padding:3px 9px;border-radius:999px;
+  background:var(--pink-light);color:var(--pink);
+  display:inline-block;margin-left:5px;
+}
+.card-desc{
+  font-size:13px;color:var(--text2);line-height:1.6;
+  display:-webkit-box;-webkit-line-clamp:2;
+  -webkit-box-orient:vertical;overflow:hidden;
+}
+.card-footer{
+  display:flex;align-items:center;
+  justify-content:space-between;
+  padding-top:10px;
+  border-top:1px solid var(--border);gap:8px;
+  margin-top:auto;flex-wrap:wrap;
+}
+.card-cat-label{
+  font-size:12px;color:var(--text3);
+  display:flex;align-items:center;gap:4px;font-weight:500;
+  flex-wrap:wrap;min-width:0;flex:1;
+}
+.card-cat-label i{font-size:12px}
+.wa-btn{
+  display:flex;align-items:center;gap:6px;
+  padding:7px 14px;
+  background:var(--wa-dim);
+  border:1.5px solid rgba(37,211,102,.3);
+  border-radius:999px;color:var(--green);
+  font-size:12px;font-weight:700;
+  transition:all .15s;flex-shrink:0;
+}
+.wa-btn:hover{
+  background:#d4f5e3;
+  border-color:var(--wa);
+  color:#1a7a5e;
+}
+.wa-btn i{font-size:14px}
+.verified-dot{
+  position:absolute;top:14px;right:14px;
+  width:8px;height:8px;background:var(--green);
+  border-radius:50%;
+}
+
+/* ── SKELETON ── */
+.skeleton{
+  background:var(--surface);border:1.5px solid var(--border);
+  border-radius:var(--radius);padding:18px;
+  display:flex;flex-direction:column;gap:12px;
+}
+.skel-line{
+  background:var(--surface2);border-radius:6px;
+  animation:shimmer 1.4s infinite;
+}
+@keyframes shimmer{0%,100%{opacity:.5}50%{opacity:1}}
+
+/* ── PAGINATION ── */
+.pagination{
+  display:flex;align-items:center;
+  justify-content:space-between;
+  padding:18px 0;border-top:1px solid var(--border);
+}
+.pag-info{font-size:13px;color:var(--text3);font-weight:500}
+.pag-btns{display:flex;align-items:center;gap:8px}
+.pag-btn{
+  width:36px;height:36px;border-radius:var(--radius-sm);
+  border:1.5px solid var(--border2);background:var(--surface);
+  color:var(--text2);font-size:16px;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .12s;box-shadow:var(--shadow);
+}
+.pag-btn:hover:not(:disabled){
+  border-color:var(--green);color:var(--green);
+  background:var(--green-light);
+}
+.pag-btn:disabled{opacity:.35;cursor:not-allowed}
+.pag-current{font-size:13px;font-weight:600;color:var(--text);padding:0 8px}
+.pag-total{font-size:13px;color:var(--text3)}
+
+/* ── OVERLAY ── */
+.overlay{
+  position:fixed;inset:0;
+  background:rgba(0,0,0,.45);
+  backdrop-filter:blur(4px);
+  z-index:500;display:none;
+  align-items:center;justify-content:center;padding:20px;
+}
+.overlay.open{display:flex}
+
+/* ── DETAIL MODAL ── */
+.detail-modal{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:20px;width:100%;max-width:540px;
+  overflow:hidden;animation:modalIn .2s ease both;
+  max-height:92vh;display:flex;flex-direction:column;
+  box-shadow:0 20px 60px rgba(0,0,0,.15);
+}
+@keyframes modalIn{
+  from{opacity:0;transform:translateY(12px) scale(.97)}
+  to{opacity:1;transform:translateY(0) scale(1)}
+}
+.detail-banner{
+  height:120px;display:flex;align-items:center;
+  justify-content:center;font-size:56px;
+  position:relative;flex-shrink:0;
+}
+.detail-banner-close{
+  position:absolute;top:12px;right:12px;
+  width:32px;height:32px;border-radius:50%;
+  background:rgba(255,255,255,.8);
+  border:1px solid rgba(0,0,0,.1);
+  color:var(--text2);font-size:15px;
+  display:flex;align-items:center;
+  justify-content:center;cursor:pointer;
+  transition:background .12s;
+}
+.detail-banner-close:hover{background:#fff}
+.detail-verified{
+  position:absolute;top:12px;left:12px;
+  display:flex;align-items:center;gap:5px;
+  background:rgba(255,255,255,.9);
+  border:1px solid rgba(26,122,94,.2);
+  padding:4px 10px;border-radius:999px;
+  font-size:10px;font-weight:700;color:var(--green);
+}
+.detail-body{padding:24px;overflow-y:auto;flex:1}
+.detail-body::-webkit-scrollbar{width:4px}
+.detail-body::-webkit-scrollbar-thumb{background:var(--border2);border-radius:999px}
+.detail-name{
+  font-family:'Syne',sans-serif;font-size:22px;font-weight:800;
+  color:var(--text);letter-spacing:-.4px;margin-bottom:10px;
+}
+.detail-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px}
+.detail-tag{padding:4px 12px;border-radius:999px;font-size:12px;font-weight:600}
+.detail-new{
+  padding:4px 12px;border-radius:999px;
+  font-size:12px;font-weight:600;
+  background:var(--pink-light);color:var(--pink);
+}
+.detail-section-lbl{
+  font-size:11px;font-weight:700;color:var(--text3);
+  letter-spacing:.5px;margin-bottom:8px;text-transform:uppercase;
+}
+.detail-desc{font-size:15px;color:var(--text2);line-height:1.7}
+.detail-meta-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px}
+.detail-meta-item{
+  display:flex;align-items:center;gap:6px;
+  font-size:12px;color:var(--text2);font-weight:500;
+  background:var(--surface2);
+  padding:7px 13px;border-radius:999px;
+  border:1px solid var(--border);
+}
+.detail-meta-item i{font-size:14px;color:var(--text3)}
+.detail-footer{
+  padding:16px 24px 24px;
+  border-top:1px solid var(--border);flex-shrink:0;
+}
+.detail-join-btn{
+  width:100%;padding:14px 0;border-radius:999px;border:none;
+  background:var(--wa);color:#fff;
+  font-size:15px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;gap:9px;
+  transition:all .15s;text-decoration:none;
+  box-shadow:0 4px 14px rgba(37,211,102,.3);
+}
+.detail-join-btn:hover{background:#1ebe5d;box-shadow:0 6px 20px rgba(37,211,102,.4)}
+.detail-join-btn i{font-size:20px}
+.detail-hint{text-align:center;font-size:12px;color:var(--text3);margin-top:8px}
+
+/* ── ADD MODAL ── */
+.modal{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:20px;width:100%;max-width:520px;
+  padding:28px;animation:modalIn .2s ease both;
+  max-height:90vh;overflow-y:auto;
+  box-shadow:0 20px 60px rgba(0,0,0,.15);
+}
+.modal-header{
+  display:flex;align-items:flex-start;
+  justify-content:space-between;gap:12px;margin-bottom:24px;
+}
+.modal-title{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--text)}
+.modal-sub{font-size:13px;color:var(--text2);margin-top:4px}
+.modal-close{
+  width:32px;height:32px;border-radius:50%;
+  border:1.5px solid var(--border2);
+  background:transparent;color:var(--text2);font-size:16px;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;transition:all .12s;
+}
+.modal-close:hover{background:var(--surface2);color:var(--text)}
+.field{margin-bottom:18px}
+.field label{
+  display:block;font-size:12px;font-weight:700;
+  color:var(--text2);letter-spacing:.4px;
+  margin-bottom:7px;text-transform:uppercase;
+}
+.field input,.field textarea{
+  width:100%;background:var(--surface2);
+  border:1.5px solid var(--border);
+  border-radius:var(--radius-sm);
+  padding:12px 14px;color:var(--text);
+  font-size:14px;font-family:inherit;outline:none;
+  transition:border-color .15s,box-shadow .15s;resize:none;
+}
+.field input:focus,.field textarea:focus{
+  border-color:var(--green);background:#fff;
+  box-shadow:0 0 0 3px rgba(26,122,94,.08);
+}
+.field input::placeholder,.field textarea::placeholder{color:var(--text3)}
+.wa-input-wrap{position:relative}
+.wa-prefix{
+  position:absolute;left:13px;top:50%;
+  transform:translateY(-50%);
+  font-size:16px;color:var(--wa);
+}
+.wa-input-wrap input{padding-left:40px}
+.field-hint{font-size:11px;color:var(--text3);margin-top:6px;line-height:1.5}
+/* category pills removed — using select dropdown */
+.modal-btns{display:flex;gap:10px;margin-top:24px}
+.btn-cancel{
+  flex:1;padding:13px 0;border-radius:999px;
+  border:1.5px solid var(--border2);background:transparent;
+  color:var(--text2);font-size:13px;font-weight:600;transition:all .15s;
+}
+.btn-cancel:hover{background:var(--surface2);color:var(--text);border-color:var(--text3)}
+.btn-submit{
+  flex:2;padding:13px 0;border-radius:999px;
+  border:none;background:var(--wa);color:#fff;
+  font-size:13px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;gap:7px;
+  transition:all .15s;
+  box-shadow:0 2px 8px rgba(37,211,102,.25);
+}
+.btn-submit:hover{background:#1ebe5d;box-shadow:0 4px 14px rgba(37,211,102,.35)}
+.btn-submit i{font-size:16px}
+.btn-submit:disabled{opacity:.6;cursor:not-allowed}
+
+/* ── TOAST ── */
+.toast{
+  position:fixed;bottom:28px;left:50%;
+  transform:translateX(-50%) translateY(20px);
+  background:#1a1814;color:#fff;
+  padding:11px 22px;border-radius:999px;
+  font-size:13px;font-weight:500;
+  display:flex;align-items:center;gap:8px;
+  opacity:0;pointer-events:none;
+  transition:all .3s ease;z-index:999;white-space:nowrap;
+  box-shadow:0 4px 20px rgba(0,0,0,.2);
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast i{font-size:15px}
+.toast.error{background:#c2185b}
+
+/* ── EMPTY STATE ── */
+.empty{
+  grid-column:1/-1;padding:80px 0;
+  display:flex;flex-direction:column;
+  align-items:center;gap:14px;text-align:center;
+}
+.empty i{font-size:48px;color:var(--border2)}
+.empty p{font-size:15px;color:var(--text2);font-weight:500}
+.empty small{font-size:13px;color:var(--text3)}
+
+/* ── CHAR COUNTER ── */
+#desc-count{font-size:11px;color:var(--text3)}
+#desc-count.warn{color:var(--orange)}
+/* ── REPORT BTN ── */
+.report-btn{
+  display:flex;align-items:center;gap:4px;
+  background:none;border:none;color:var(--text3);
+  font-size:11px;cursor:pointer;margin-top:10px;
+  font-family:inherit;padding:4px 0;
+  transition:color .12s;
+}
+.report-btn:hover{color:var(--pink)}
+.report-btn i{font-size:13px}
+/* ── REPORT MODAL ── */
+.report-modal{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:16px;width:100%;max-width:420px;
+  padding:24px;animation:modalIn .2s ease both;
+  box-shadow:0 20px 60px rgba(0,0,0,.15);
+}
+.report-options{display:flex;flex-direction:column;gap:8px;margin:14px 0}
+.report-option{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 14px;border-radius:var(--radius-sm);
+  border:1.5px solid var(--border);background:var(--surface);
+  color:var(--text2);font-size:13px;cursor:pointer;
+  font-family:inherit;text-align:left;transition:all .12s;
+}
+.report-option:hover{border-color:var(--pink);color:var(--pink);background:var(--pink-light)}
+.report-option.sel{border-color:var(--pink);color:var(--pink);background:var(--pink-light)}
+.btn-report-submit{
+  width:100%;padding:12px 0;border-radius:999px;
+  border:none;background:var(--pink);color:#fff;
+  font-size:13px;font-weight:700;transition:background .15s;
+  margin-top:4px;
+}
+.btn-report-submit:hover{background:#ad1457}
+.btn-report-submit:disabled{opacity:.5;cursor:not-allowed}
+
+/* ── ONLINE/OFFLINE BADGE ── */
+.badge-online{
+  display:inline-flex;align-items:center;gap:4px;
+  font-size:10px;font-weight:600;padding:2px 8px;border-radius:999px;
+  background:#e8f8ee;color:#1a7a5e;
+}
+.badge-online::before{
+  content:'';width:6px;height:6px;border-radius:50%;
+  background:#25D366;display:inline-block;
+}
+.badge-offline{
+  display:inline-flex;align-items:center;gap:4px;
+  font-size:10px;font-weight:600;padding:2px 8px;border-radius:999px;
+  background:#f3f0ff;color:#7c3aed;
+}
+.badge-offline::before{
+  content:'';width:6px;height:6px;border-radius:50%;
+  background:#7c3aed;display:inline-block;
+}
+.badge-both{
+  display:inline-flex;align-items:center;gap:4px;
+  font-size:10px;font-weight:600;padding:2px 8px;border-radius:999px;
+  background:#f4f3f0;color:#6b6560;
+}
+
+/* ── FILTER GROUP ── */
+.filter-group{
+  display:flex;gap:8px;flex-wrap:wrap;
+  margin-bottom:10px;align-items:center;
+}
+.filter-divider{
+  width:1px;height:20px;background:var(--border2);
+  margin:0 4px;flex-shrink:0;
+}
+
+/* ── SELECT STYLE ── */
+.filter-select{
+  height:34px;padding:0 12px;
+  border:1.5px solid var(--border2);
+  border-radius:999px;
+  background:var(--surface);color:var(--text2);
+  font-size:13px;font-weight:500;
+  font-family:inherit;outline:none;cursor:pointer;
+  appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23a09890' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;
+  background-position:right 10px center;
+  padding-right:28px;
+  transition:all .12s;
+}
+.filter-select:focus{
+  border-color:var(--green);
+  box-shadow:0 0 0 3px rgba(26,122,94,.08);
+  color:var(--text);
+}
+.filter-select.active{
+  background-color:var(--green);
+  border-color:var(--green);
+  color:#fff;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23ffffff' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+}
+
+/* ── FORM SELECT ── */
+.field select{
+  width:100%;background:var(--surface2);
+  border:1.5px solid var(--border);
+  border-radius:var(--radius-sm);
+  padding:12px 14px;color:var(--text);
+  font-size:14px;font-family:inherit;outline:none;
+  transition:border-color .15s,box-shadow .15s;
+  appearance:none;cursor:pointer;
+}
+.field select:focus{
+  border-color:var(--green);background:#fff;
+  box-shadow:0 0 0 3px rgba(26,122,94,.08);
+}
+
+/* ── ONLINE TOGGLE IN FORM ── */
+.toggle-row{
+  display:flex;gap:8px;margin-top:4px;
+}
+.toggle-opt{
+  flex:1;padding:10px 8px;
+  border-radius:var(--radius-sm);
+  border:1.5px solid var(--border2);
+  background:var(--surface);
+  font-size:13px;font-weight:500;color:var(--text2);
+  cursor:pointer;text-align:center;transition:all .12s;
+  display:flex;align-items:center;justify-content:center;gap:6px;
+}
+.toggle-opt i{font-size:15px}
+.toggle-opt:hover{border-color:var(--text3);color:var(--text);background:var(--surface2)}
+.toggle-opt.sel-online{
+  background:#e8f8ee;border-color:#25D366;color:#1a7a5e;font-weight:600;
+}
+.toggle-opt.sel-offline{
+  background:#f3f0ff;border-color:#7c3aed;color:#7c3aed;font-weight:600;
+}
+.toggle-opt.sel-both{
+  background:var(--green-light);border-color:var(--green);color:var(--green);font-weight:600;
+}
+
+/* ── RESPONSIVE ── */
+@media(max-width:800px){
+  .layout{grid-template-columns:1fr}
+  .sidebar-wrap{
+    position:static;padding:16px 16px 0;
+    border-bottom:1px solid var(--border);
+    max-height:none;
+  }
+  .sidebar{flex-direction:row;flex-wrap:wrap;gap:6px}
+  .sidebar-label,.sidebar-divider{display:none}
+  .cat-btn{width:auto;padding:7px 13px;font-size:12px;border-radius:999px;border:1.5px solid var(--border)}
+  .cat-btn.active{border-color:var(--green)}
+  .cat-count{display:none}
+  .main-wrap{border-left:none;padding:16px}
+  .hero{padding:28px 16px 0}
+  .header{padding:0 16px}
+  .header-search{display:none}
+  .hero h1{font-size:28px}
+}
+</style>
+
+<!-- Mixpanel -->
+<script>
+(function(f,b){if(!b.__SV){var e,g,i,h;window.mixpanel=b;b._i=[];b.init=function(e,f,c){function g(a,d){var b=d.split(".");2==b.length&&(a=a[b[0]],d=b[1]);a[d]=function(){a.push([d].concat(Array.prototype.slice.call(arguments,0)))}}var a=b;"undefined"!==typeof c?a=b[c]=[]:c="mixpanel";a.people=a.people||[];a.toString=function(a){var d="mixpanel";"mixpanel"!==c&&(d+="."+c);a||(d+=" (stub)");return d};a.people.toString=function(){return a.toString(1)+".people (stub)"};i="disable time_event track track_pageview track_links track_forms track_with_groups add_group set_group remove_group register register_once alias unregister identify name_tag set_config reset opt_in_tracking opt_out_tracking has_opted_in_tracking has_opted_out_tracking clear_opt_in_out_tracking start_batch_senders people.set people.set_once people.unset people.increment people.append people.union people.track_charge people.clear_charges people.delete_user people.remove".split(" ");for(h=0;h<i.length;h++)g(a,i[h]);var j="set set_once union unset remove delete".split(" ");a.get_group=function(){function b(c){d[c]=function(){call2_args=arguments;call2=[c].concat(Array.prototype.slice.call(call2_args,0));a.push([e].concat(call2))}}for(var d={},e=["get_group"].concat(Array.prototype.slice.call(arguments,0)),c=0;c<j.length;c++)b(j[c]);return d};b._i.push([e,f,c])};b.__SV=1.2;e=f.createElement("script");e.type="text/javascript";e.async=!0;e.src="undefined"!==typeof MIXPANEL_CUSTOM_LIB_URL?MIXPANEL_CUSTOM_LIB_URL:"https://cdn.mxpnl.com/libs/mixpanel-2-latest.min.js";g=f.getElementsByTagName("script")[0];g.parentNode.insertBefore(e,g)}})(document,window.mixpanel||[]);
+mixpanel.init('bd56a891f17bb6f6cd5be61a4399fd49', {track_pageview: true, persistence: 'localStorage', api_host: 'https://api-eu.mixpanel.com'});
+</script>
+<!-- End Mixpanel -->
+
+<!-- Google Analytics GA4 -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-9F4PJSZW40"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-9F4PJSZW40', {
+    page_title: 'Close.Connect',
+    page_location: window.location.href
+  });
+  // helper to fire GA4 events safely
+  function gtrack(name, params) {
+    if (window.gtag) gtag('event', name, params || {});
+  }
+</script>
+<!-- End Google Analytics -->
+
+
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="logo">Close<span>.</span>Connect</div>
+  <div class="header-search">
+    <i class="ti ti-search"></i>
+    <input type="text" id="global-search" placeholder="Search communities…" oninput="handleSearch(this.value)"/>
+  </div>
+  <div class="header-right">
+    <button class="add-btn" onclick="openModal()">
+      <i class="ti ti-plus"></i>Add Community
+    </button>
+  </div>
+</header>
+
+<!-- HERO -->
+<div class="hero">
+  <h1>Find Your <em>People</em><br/>Wherever You Are</h1>
+  <p>Browse WhatsApp communities by interest. Online or offline — Discover groups that match your vibe and join in one tap.</p>
+</div>
+
+<!-- LAYOUT -->
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar-wrap">
+    <div class="sidebar" id="sidebar">
+      <div class="sidebar-label">Categories</div>
+      <button class="cat-btn active" onclick="setCategory('all',this)">
+        <i class="ti ti-grid-dots"></i>All Communities
+        <span class="cat-count" id="count-all">—</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main-wrap">
+    <div class="filter-group">
+      <span class="filter-label">Sort:</span>
+      <button class="fpill on" onclick="setFilter('all',this)">Latest</button>
+      <button class="fpill" onclick="setFilter('popular',this)">Most Popular</button>
+      <button class="fpill" onclick="setFilter('new',this)">This Week</button>
+      <div class="filter-divider"></div>
+      <span class="filter-label">Type:</span>
+      <button class="fpill" id="filter-online" onclick="setTypeFilter('online',this)"><i class="ti ti-wifi" style="font-size:13px"></i> Online</button>
+      <button class="fpill" id="filter-offline" onclick="setTypeFilter('offline',this)"><i class="ti ti-map-pin" style="font-size:13px"></i> Offline</button>
+      <div class="filter-divider"></div>
+      <select class="filter-select" id="filter-city" onchange="setCityFilter(this)">
+        <option value="">All Cities</option>
+        <option value="Bengaluru">Bengaluru</option>
+        <option value="Mumbai">Mumbai</option>
+        <option value="Delhi">Delhi</option>
+        <option value="Chennai">Chennai</option>
+        <option value="Hyderabad">Hyderabad</option>
+        <option value="Pune">Pune</option>
+        <option value="Kolkata">Kolkata</option>
+        <option value="Ahmedabad">Ahmedabad</option>
+        <option value="Jaipur">Jaipur</option>
+        <option value="Surat">Surat</option>
+        <option value="Lucknow">Lucknow</option>
+        <option value="Kochi">Kochi</option>
+        <option value="Indore">Indore</option>
+        <option value="Bhopal">Bhopal</option>
+        <option value="Chandigarh">Chandigarh</option>
+        <option value="Nagpur">Nagpur</option>
+        <option value="Visakhapatnam">Visakhapatnam</option>
+        <option value="Coimbatore">Coimbatore</option>
+        <option value="Thiruvananthapuram">Thiruvananthapuram</option>
+        <option value="Patna">Patna</option>
+        <option value="Online">Online (no city)</option>
+      </select>
+    </div>
+    <div class="grid" id="community-grid"></div>
+    <div class="pagination">
+      <span class="pag-info" id="pag-info"></span>
+      <div class="pag-btns">
+        <button class="pag-btn" id="pag-prev" onclick="changePage(-1)" disabled>
+          <i class="ti ti-chevron-left"></i>
+        </button>
+        <span>
+          <span class="pag-current" id="pag-cur">1</span>
+          <span class="pag-total" id="pag-tot">/ 1</span>
+        </span>
+        <button class="pag-btn" id="pag-next" onclick="changePage(1)">
+          <i class="ti ti-chevron-right"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DETAIL MODAL -->
+<div class="overlay" id="detail-overlay" onclick="closeDetailOutside(event)">
+  <div class="detail-modal">
+    <div class="detail-banner" id="dm-banner">
+      <span id="dm-emoji"></span>
+      <button class="detail-banner-close" onclick="closeDetail()"><i class="ti ti-x"></i></button>
+      <div class="detail-verified" id="dm-verified" style="display:none">
+        <i class="ti ti-circle-check"></i>verified
+      </div>
+    </div>
+    <div class="detail-body">
+      <div class="detail-name" id="dm-name"></div>
+      <div class="detail-tags" id="dm-tags"></div>
+      <div class="detail-section-lbl">about this community</div>
+      <div class="detail-desc" id="dm-desc"></div>
+      <div class="detail-meta-row" id="dm-meta"></div>
+    </div>
+    <div class="detail-footer">
+      <a id="dm-join-btn" href="#" target="_blank" rel="noopener" class="detail-join-btn">
+        <i class="ti ti-brand-whatsapp"></i>Join on WhatsApp
+      </a>
+      <div class="detail-hint">Opens WhatsApp — Free to Join</div>
+      <div style="text-align:center;margin-top:6px">
+        <button class="report-btn" id="report-trigger"><i class="ti ti-flag"></i>Report This Community</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ADD COMMUNITY MODAL -->
+<div class="overlay" id="overlay" onclick="closeModalOutside(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title">Add Your Community</div>
+        <div class="modal-sub">Paste your WhatsApp link and fill in the details</div>
+      </div>
+      <button class="modal-close" onclick="closeModal()"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="field">
+      <label>WhatsApp Community Link</label>
+      <div class="wa-input-wrap">
+        <i class="ti ti-brand-whatsapp wa-prefix"></i>
+        <input type="url" id="f-link" placeholder="https://chat.whatsapp.com/…" maxlength="200" autocomplete="off"/>
+      </div>
+      <div class="field-hint">WhatsApp → Community info → Invite via link</div>
+    </div>
+    <div class="field">
+      <label>Community Name</label>
+      <input type="text" id="f-name" placeholder="e.g. Weekend Runners Bengaluru" maxlength="100"/>
+    </div>
+    <div class="field">
+      <label>Your Name</label>
+      <input type="text" id="f-creator" placeholder="e.g. Srikeerthi" maxlength="60"/>
+    </div>
+    <div class="field">
+      <label>About This Community</label>
+      <textarea id="f-desc" rows="3" placeholder="what is this community about? who should join?" maxlength="500"></textarea>
+      <div class="field-hint" id="desc-count" style="text-align:right;margin-top:4px">0 / 500</div>
+    </div>
+    <div class="field">
+      <label>Community Type</label>
+      <div class="toggle-row">
+        <button type="button" class="toggle-opt" id="tog-online" onclick="setCommType('online')">
+          <i class="ti ti-wifi"></i> Online
+        </button>
+        <button type="button" class="toggle-opt" id="tog-offline" onclick="setCommType('offline')">
+          <i class="ti ti-map-pin"></i> Offline
+        </button>
+        <button type="button" class="toggle-opt" id="tog-both" onclick="setCommType('both')">
+          <i class="ti ti-world"></i> Both
+        </button>
+      </div>
+      <div class="field-hint">Online = Virtual Only · Offline = In-Person · Both = Hybrid</div>
+    </div>
+    <div class="field" id="city-field">
+      <label>City <span style="color:var(--text3);font-weight:400;font-size:10px">(skip if online only)</span></label>
+      <select id="f-city">
+        <option value="">select city…</option>
+        <option value="Bengaluru">Bengaluru</option>
+        <option value="Mumbai">Mumbai</option>
+        <option value="Delhi">Delhi</option>
+        <option value="Chennai">Chennai</option>
+        <option value="Hyderabad">Hyderabad</option>
+        <option value="Pune">Pune</option>
+        <option value="Kolkata">Kolkata</option>
+        <option value="Ahmedabad">Ahmedabad</option>
+        <option value="Jaipur">Jaipur</option>
+        <option value="Surat">Surat</option>
+        <option value="Lucknow">Lucknow</option>
+        <option value="Kochi">Kochi</option>
+        <option value="Indore">Indore</option>
+        <option value="Bhopal">Bhopal</option>
+        <option value="Chandigarh">Chandigarh</option>
+        <option value="Nagpur">Nagpur</option>
+        <option value="Visakhapatnam">Visakhapatnam</option>
+        <option value="Coimbatore">Coimbatore</option>
+        <option value="Thiruvananthapuram">Thiruvananthapuram</option>
+        <option value="Patna">Patna</option>
+        <option value="other">other city…</option>
+      </select>
+    </div>
+    <div class="field" id="city-other-field" style="display:none">
+      <label>City Name</label>
+      <input type="text" id="f-city-other" placeholder="type your city…" maxlength="60"/>
+    </div>
+    <div class="field">
+      <label>Category</label>
+      <select id="cat-select-form" class="field" style="margin-bottom:0">
+        <option value="">select a category…</option>
+      </select>
+    </div>
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-submit" id="submit-btn" onclick="submitForm()">
+        <i class="ti ti-brand-whatsapp"></i>Submit Community
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- REPORT MODAL -->
+<div class="overlay" id="report-overlay" onclick="closeReportOutside(event)">
+  <div class="report-modal">
+    <div class="modal-header" style="margin-bottom:8px">
+      <div>
+        <div class="modal-title" style="font-size:17px">Report Community</div>
+        <div class="modal-sub">Help us keep the directory clean</div>
+      </div>
+      <button class="modal-close" onclick="closeReport()"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="report-options" id="report-options">
+      <button class="report-option" onclick="selReport(this,'dead_link')"><i class="ti ti-link-off" style="font-size:16px"></i>Link No Longer Works</button>
+      <button class="report-option" onclick="selReport(this,'spam')"><i class="ti ti-alert-triangle" style="font-size:16px"></i>Spam Or Fake Community</button>
+      <button class="report-option" onclick="selReport(this,'inappropriate')"><i class="ti ti-ban" style="font-size:16px"></i>Inappropriate Content</button>
+      <button class="report-option" onclick="selReport(this,'duplicate')"><i class="ti ti-copy" style="font-size:16px"></i>Duplicate Listing</button>
+    </div>
+    <button class="btn-report-submit" id="report-submit-btn" onclick="submitReport()" disabled>Submit Report</button>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer style="border-top:1px solid var(--border);padding:24px 32px;max-width:1600px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+  <span style="font-family:'Syne',sans-serif;font-weight:800;font-size:16px;color:var(--text)">Close<span style="color:var(--green)">.</span>Connect</span>
+  <span style="font-size:13px;color:var(--text3)">queries or concerns? <a href="mailto:closeconnect27@gmail.com" style="color:var(--green);font-weight:600;text-decoration:none">closeconnect27@gmail.com</a></span>
+</footer>
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <i class="ti ti-circle-check"></i>
+  <span id="toast-msg">community added!</span>
+</div>
+
+
+<script>
+// ── CONFIG — fill in your Supabase values ──
+const SUPABASE_URL  = 'https://vcfrezqaagrmgxrtmvwg.supabase.co'
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZjZnJlenFhYWdybWd4cnRtdndnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEwNTgzNzgsImV4cCI6MjA5NjYzNDM3OH0.CL-i8tus0pjAKnPNZSm5D1V7Q3va6mwIFOfPQwC3EdY'
+// ──────────────────────────────────────────
+
+const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON)
+
+const PER_PAGE = 12
+let page = 1, cat = 'all', filter = 'all', q = '', selCatSlug = ''
+let cats = [], total = 0
+let filterType = 'all', filterCity = '', selCommType = ''
+
+// ── SIDEBAR ICONS ──
+const CAT_ICONS = {
+  sports:'ti-run', tech:'ti-code', arts:'ti-palette',
+  food:'ti-coffee', music:'ti-music', wellness:'ti-heart',
+  gaming:'ti-device-gamepad-2', travel:'ti-plane', photography:'ti-camera',
+  social:'ti-confetti', books:'ti-book', pets:'ti-paw',
+  parenting:'ti-baby-carriage', education:'ti-school', finance:'ti-coin',
+  business:'ti-briefcase', lgbtq:'ti-heart-handshake', jobs:'ti-building',
+  other:'ti-dots'
+}
+
+// ── INIT ──
+async function init() {
+  showSkeletons()
+  const { data } = await db.from('categories').select('*').order('sort_order')
+  cats = data || []
+  buildSidebar()
+  buildCatPills()
+  await loadGrid()
+}
+
+// ── SIDEBAR ──
+function buildSidebar() {
+  const sb = document.getElementById('sidebar')
+  sb.querySelectorAll('.cat-btn:not(:first-child)').forEach(el => el.remove())
+  cats.forEach(c => {
+    const btn = document.createElement('button')
+    btn.className = 'cat-btn'
+    btn.innerHTML = `<i class="ti ${CAT_ICONS[c.slug]||'ti-tag'}"></i>${c.name}<span class="cat-count">—</span>`
+    btn.onclick = () => setCategory(c.slug, btn)
+    sb.appendChild(btn)
+  })
+}
+
+// ── CAT PILLS IN FORM ──
+function buildCatPills() {
+  const sel = document.getElementById('cat-select-form')
+  if (!sel) return
+  sel.innerHTML = '<option value="">select a category…</option>'
+  cats.forEach(c => {
+    const opt = document.createElement('option')
+    opt.value = c.slug
+    opt.textContent = `${c.emoji || ''} ${c.name}`.trim()
+    sel.appendChild(opt)
+  })
+  sel.onchange = () => { selCatSlug = sel.value }
+}
+
+// ── LOAD GRID ──
+async function loadGrid() {
+  showSkeletons()
+
+  let query = db
+    .from('communities')
+    .select('*, categories(name,slug,emoji,color_bg,color_text)', { count: 'exact' })
+    .eq('status', 'active')
+
+  if (q) query = query.or(`name.ilike.%${q}%,description.ilike.%${q}%`)
+  if (filterType !== 'all') query = query.eq('community_type', filterType)
+  if (filterCity) query = query.ilike('city', filterCity)
+
+  // ── category filter — DB level using category_id ──
+  if (cat !== 'all') {
+    const catObj = cats.find(c => c.slug === cat)
+    if (catObj) query = query.eq('category_id', catObj.id)
+  }
+
+  if (filter === 'popular') query = query.order('click_count', { ascending: false })
+  else query = query.order('created_at', { ascending: false })
+  if (filter === 'new') {
+    const cutoff = new Date(Date.now() - 7*24*60*60*1000).toISOString()
+    query = query.gte('created_at', cutoff)
+  }
+  query = query.range((page-1)*PER_PAGE, page*PER_PAGE-1)
+
+  const { data, count } = await query
+  total = count || 0
+
+  renderGrid(data || [])
+  renderPagination()
+  updateSidebarCounts()
+}
+
+// ── RENDER GRID ──
+function renderGrid(list) {
+  const grid = document.getElementById('community-grid')
+  if (!list.length) {
+    grid.innerHTML = `<div class="empty">
+      <i class="ti ti-search-off"></i>
+      <p>No Communities Found</p>
+      <small>Try a different search or category</small>
+    </div>`
+    return
+  }
+  grid.innerHTML = list.map(c => {
+    const ct = c.categories || {}
+    const bg = ct.color_bg || '#1a1a1a'
+    const fg = ct.color_text || '#888'
+    const isNew = Date.now() - new Date(c.created_at) < 7*24*60*60*1000
+    return `<div class="card" onclick="openDetail('${c.id}')">
+      ${c.is_verified ? '<span class="verified-dot"></span>' : ''}
+      <div class="card-top">
+        <div class="card-icon" style="background:${bg}">${ct.emoji||'💬'}</div>
+        <div class="card-meta">
+          <div class="card-name">${esc(c.name)}</div>
+          <span class="card-cat" style="background:${bg};color:${fg}">${esc(ct.name||'')}</span>
+          ${isNew ? '<span class="card-new">new</span>' : ''}
+        </div>
+      </div>
+      <div class="card-desc">${esc(c.description||'')}</div>
+      <div class="card-footer">
+        <span class="card-cat-label">
+          ${c.community_type === 'online' ? '<span class="badge-online">online</span>' :
+            c.community_type === 'offline' ? '<span class="badge-offline">offline</span>' :
+            '<span class="badge-both">online+offline</span>'}
+          ${c.city ? '<span style="font-size:10px;color:var(--text3);margin-left:4px"><i class="ti ti-map-pin" style="font-size:10px"></i> ' + esc(c.city) + '</span>' : ''}
+        </span>
+        <a href="${safeJoinHref(c.whatsapp_link)}" target="_blank" rel="noopener noreferrer"
+           class="wa-btn" onclick="trackClick(event,'${c.id}')">
+          <i class="ti ti-brand-whatsapp"></i>join
+        </a>
+      </div>
+    </div>`
+  }).join('')
+}
+
+// ── PAGINATION ──
+function renderPagination() {
+  const pages = Math.max(1, Math.ceil(total / PER_PAGE))
+  const start = (page-1)*PER_PAGE+1
+  const end   = Math.min(page*PER_PAGE, total)
+  document.getElementById('pag-info').textContent =
+    total > 0 ? `showing ${start}–${end} of ${total} communities` : '0 communities'
+  document.getElementById('pag-cur').textContent = page
+  document.getElementById('pag-tot').textContent = `/ ${pages}`
+  document.getElementById('pag-prev').disabled = page <= 1
+  document.getElementById('pag-next').disabled = page >= pages
+}
+
+// ── SKELETON ──
+function showSkeletons() {
+  document.getElementById('community-grid').innerHTML =
+    Array(6).fill(0).map(() => `<div class="skeleton">
+      <div class="skel-line" style="height:46px;width:46px;border-radius:10px"></div>
+      <div class="skel-line" style="height:14px;width:65%"></div>
+      <div class="skel-line" style="height:12px;width:100%"></div>
+      <div class="skel-line" style="height:12px;width:80%"></div>
+    </div>`).join('')
+}
+
+// ── SIDEBAR COUNTS ──
+async function updateSidebarCounts() {
+  const { count } = await db.from('communities')
+    .select('*', { count:'exact', head:true }).eq('status','active')
+  const el = document.getElementById('count-all')
+  if (el) el.textContent = count || 0
+}
+
+// ── CONTROLS ──
+function setCategory(slug, btn) {
+  cat = slug; page = 1
+  document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'))
+  btn.classList.add('active')
+  if (window.mixpanel) mixpanel.track('category_clicked', { category: slug })
+  gtrack('category_clicked', { category: slug })
+  loadGrid()
+}
+function setFilter(f, btn) {
+  filter = f; page = 1
+  document.querySelectorAll('.fpill').forEach(b => b.classList.remove('on'))
+  btn.classList.add('on')
+  loadGrid()
+}
+function handleSearch(v) {
+  q = v.trim(); page = 1
+  clearTimeout(handleSearch._t)
+  handleSearch._t = setTimeout(loadGrid, 350)
+}
+function changePage(dir) {
+  const pages = Math.ceil(total/PER_PAGE)
+  page = Math.max(1, Math.min(pages, page+dir))
+  loadGrid()
+  window.scrollTo({top:0, behavior:'smooth'})
+}
+
+// ── CLICK TRACKING ──
+async function trackClick(e, id) {
+  e.stopPropagation()
+  if (window.mixpanel) mixpanel.track('whatsapp_join_clicked', { community_id: id, referrer: document.referrer || 'direct' })
+  gtrack('whatsapp_join_clicked', { community_id: id })
+  try {
+    const sid = sessionStorage.getItem('cc_sid') || crypto.randomUUID()
+    sessionStorage.setItem('cc_sid', sid)
+    await db.from('community_clicks').insert({
+      community_id: id,
+      session_id: sid,
+      referrer: document.referrer || null,
+      user_agent: navigator.userAgent
+    })
+    await db.rpc('increment_click', { community_id: id })
+  } catch(_) {}
+}
+
+// ── DETAIL MODAL ──
+async function openDetail(id) {
+  if (window.mixpanel) mixpanel.track('community_card_opened', { community_id: id })
+  gtrack('community_card_opened', { community_id: id })
+  const { data: c } = await db
+    .from('communities')
+    .select('*, categories(name,slug,emoji,color_bg,color_text)')
+    .eq('id', id).single()
+  if (!c) return
+  const ct = c.categories || {}
+  document.getElementById('dm-banner').style.background = ct.color_bg || '#1a1a1a'
+  document.getElementById('dm-emoji').textContent = ct.emoji || '💬'
+  document.getElementById('dm-name').textContent = c.name
+  document.getElementById('dm-verified').style.display = c.is_verified ? 'flex' : 'none'
+  const isNew = Date.now() - new Date(c.created_at) < 7*24*60*60*1000
+  document.getElementById('dm-tags').innerHTML =
+    `<span class="detail-tag" style="background:${ct.color_bg||'#1a1a1a'};color:${ct.color_text||'#888'}">${esc(ct.name||'')}</span>` +
+    (isNew ? '<span class="detail-new">new</span>' : '')
+  document.getElementById('dm-desc').textContent = c.description || ''
+  const typeLabel = c.community_type === 'online' ? 'online' : c.community_type === 'offline' ? 'offline' : 'online & offline'
+  const typeIcon = c.community_type === 'online' ? 'ti-wifi' : c.community_type === 'offline' ? 'ti-map-pin' : 'ti-world'
+  document.getElementById('dm-meta').innerHTML = `
+    <div class="detail-meta-item"><i class="ti ti-brand-whatsapp"></i>WhatsApp</div>
+    <div class="detail-meta-item"><i class="ti ${typeIcon}"></i>${typeLabel}</div>
+    ${c.city ? '<div class="detail-meta-item"><i class="ti ti-map-pin"></i>' + esc(c.city) + '</div>' : ''}
+    <div class="detail-meta-item"><i class="ti ti-tag"></i>${esc(ct.name||'')}</div>`
+  reportingCommunityId = c.id
+  const btn = document.getElementById('dm-join-btn')
+  btn.href = safeJoinHref(c.whatsapp_link)
+  btn.onclick = (e) => trackClick(e, c.id)
+  document.getElementById('detail-overlay').classList.add('open')
+  document.body.style.overflow = 'hidden'
+}
+function closeDetail() {
+  document.getElementById('detail-overlay').classList.remove('open')
+  document.body.style.overflow = ''
+}
+function closeDetailOutside(e) {
+  if (e.target === document.getElementById('detail-overlay')) closeDetail()
+}
+
+// ── SUBMIT MODAL ──
+function openModal() {
+  document.getElementById('overlay').classList.add('open')
+  document.body.style.overflow = 'hidden'
+  // scroll modal to top and focus first field
+  setTimeout(() => {
+    const modal = document.querySelector('.modal')
+    if (modal) modal.scrollTop = 0
+    const firstField = document.getElementById('f-link')
+    if (firstField) firstField.focus()
+  }, 50)
+}
+function closeModal() {
+  document.getElementById('overlay').classList.remove('open')
+  document.body.style.overflow = ''
+}
+function closeModalOutside(e) {
+  if (e.target === document.getElementById('overlay')) closeModal()
+}
+
+// ── SUBMIT RATE LIMIT (max 3 submissions per session) ──
+function checkRateLimit() {
+  const key = 'cc_submits'
+  const data = JSON.parse(sessionStorage.getItem(key) || '{"count":0,"reset":0}')
+  const now = Date.now()
+  if (now > data.reset) { data.count = 0; data.reset = now + 60*60*1000 }
+  if (data.count >= 50) return false
+  data.count++
+  sessionStorage.setItem(key, JSON.stringify(data))
+  return true
+}
+
+// ── STRICT WHATSAPP URL VALIDATOR ──
+function isValidWaLink(url) {
+  try {
+    const u = new URL(url)
+    return u.protocol === 'https:' &&
+           u.hostname === 'chat.whatsapp.com' &&
+           u.pathname.length > 1 &&
+           /^\/[A-Za-z0-9_-]{10,}$/.test(u.pathname)
+  } catch { return false }
+}
+
+// ── SANITISE TEXT (strip HTML tags) ──
+function sanitise(s, max) {
+  return String(s).replace(/<[^>]*>/g,'').replace(/[<>"']/g,'').trim().slice(0, max)
+}
+
+async function submitForm() {
+  const rawLink    = document.getElementById('f-link').value.trim()
+  const rawName    = document.getElementById('f-name').value.trim()
+  const rawDesc    = document.getElementById('f-desc').value.trim()
+  const rawCreator = document.getElementById('f-creator').value.trim()
+
+  // ── 1. required fields ──
+  if (!rawLink || !rawName || !rawDesc || !selCatSlug) {
+    toast('Please fill in all fields and pick a category.', true); return
+  }
+
+  // ── 2. strict WhatsApp URL check ──
+  if (!isValidWaLink(rawLink)) {
+    toast('Please enter a valid WhatsApp community link.', true); return
+  }
+
+  // ── 3. length checks ──
+  if (rawName.length < 3)  { toast('Community name must be at least 3 characters.', true); return }
+  if (rawName.length > 100){ toast('Community name must be under 100 characters.', true); return }
+  if (rawDesc.length < 10) { toast('Please write at least 10 characters about this community.', true); return }
+  if (rawDesc.length > 500){ toast('Description must be under 500 characters.', true); return }
+
+  // ── 4. session rate limit ──
+  if (!checkRateLimit()) {
+    toast('Too many submissions — please try again later.', true); return
+  }
+
+  // ── 5. sanitise inputs ──
+  const link    = rawLink
+  const name    = sanitise(rawName, 100)
+  const desc    = sanitise(rawDesc, 500)
+  const creator = sanitise(rawCreator, 60)
+
+  // ── 6. duplicate check ──
+  const { data: dup } = await db.from('communities')
+    .select('id').eq('whatsapp_link', link).limit(1)
+  if (dup && dup.length > 0) {
+    toast('This community is already listed!', true); return
+  }
+
+  const btn = document.getElementById('submit-btn')
+  btn.disabled = true
+  btn.innerHTML = '<i class="ti ti-loader-2" style="animation:spin 1s linear infinite"></i> submitting…'
+
+  try {
+    const catMatch = cats.find(c => c.slug === selCatSlug)
+    // resolve city
+    const rawCity = document.getElementById('f-city')?.value || ''
+    const cityOtherVal = document.getElementById('f-city-other')?.value.trim() || ''
+    const finalCity = rawCity === 'other' ? sanitise(cityOtherVal, 60) : rawCity
+    const { error } = await db.from('communities').insert({
+      name,
+      description: desc,
+      whatsapp_link: link,
+      category_id: catMatch ? catMatch.id : null,
+      submitted_by_name: creator || null,
+      submitted_by_email: null,
+      community_type: selCommType || 'both',
+      city: finalCity || null,
+      status: 'active'
+    })
+    if (error) {
+      // DB constraint violation — bad link or length
+      if (error.code === '23514') {
+        toast('Invalid WhatsApp link — only chat.whatsapp.com links allowed.', true)
+      } else if (error.code === '23505') {
+        toast('This community is already listed!', true)
+      } else {
+        throw error
+      }
+      return
+    }
+
+    closeModal()
+    toast('🎉 Community added! It\'s live now.')
+    if (window.mixpanel) mixpanel.track('community_submitted', { category: selCatSlug, city: finalCity || 'none', type: selCommType || 'both' })
+    gtrack('community_submitted', { category: selCatSlug, city: finalCity || 'none', type: selCommType || 'both' })
+    resetForm()
+    page = 1; filter = 'all'; cat = 'all'
+    document.querySelectorAll('.fpill').forEach(b=>b.classList.remove('on'))
+    document.querySelectorAll('.fpill')[0].classList.add('on')
+    document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('active'))
+    document.querySelectorAll('.cat-btn')[0].classList.add('active')
+    loadGrid()
+  } catch(err) {
+    toast('Something went wrong — please try again.', true)
+    console.error(err)
+  } finally {
+    btn.disabled = false
+    btn.innerHTML = '<i class="ti ti-brand-whatsapp"></i> submit community'
+  }
+}
+
+// ── CHAR COUNTER ──
+document.getElementById('f-desc').addEventListener('input', function() {
+  const len = this.value.length
+  const el = document.getElementById('desc-count')
+  el.textContent = len + ' / 500'
+  el.className = 'field-hint' + (len > 450 ? ' warn' : '')
+})
+
+// ── TYPE FILTER ──
+function setTypeFilter(type, btn) {
+  if (filterType === type) {
+    // toggle off
+    filterType = 'all'
+    btn.classList.remove('on')
+  } else {
+    filterType = type
+    document.querySelectorAll('#filter-online,#filter-offline').forEach(b => b.classList.remove('on'))
+    btn.classList.add('on')
+    // update city select active state
+    const cityEl = document.getElementById('filter-city')
+    if (cityEl) cityEl.classList.toggle('active', cityEl.value !== '')
+  }
+  page = 1
+  loadGrid()
+}
+
+function setCityFilter(sel) {
+  filterCity = sel.value
+  sel.classList.toggle('active', sel.value !== '')
+  page = 1
+  loadGrid()
+}
+
+// ── COMMUNITY TYPE IN FORM ──
+function setCommType(type) {
+  selCommType = type
+  document.querySelectorAll('.toggle-opt').forEach(b => {
+    b.classList.remove('sel-online','sel-offline','sel-both')
+  })
+  document.getElementById('tog-' + type).classList.add('sel-' + type)
+  // show/hide city field
+  const cityField = document.getElementById('city-field')
+  const cityOther = document.getElementById('city-other-field')
+  if (type === 'online') {
+    cityField.style.opacity = '.4'; cityField.style.pointerEvents = 'none'
+  } else {
+    cityField.style.opacity = '1'; cityField.style.pointerEvents = ''
+  }
+}
+
+// ── CITY OTHER FIELD ──
+document.addEventListener('DOMContentLoaded', () => {
+  const citySelect = document.getElementById('f-city')
+  if (citySelect) {
+    citySelect.addEventListener('change', function() {
+      const otherField = document.getElementById('city-other-field')
+      if (otherField) otherField.style.display = this.value === 'other' ? '' : 'none'
+    })
+  }
+})
+
+function resetForm() {
+  ['f-link','f-name','f-desc','f-creator','f-city','f-city-other'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.value = ''
+  })
+  document.querySelectorAll('.toggle-opt').forEach(b => b.classList.remove('sel-online','sel-offline','sel-both'))
+  const catSel = document.getElementById('cat-select-form'); if (catSel) catSel.value = ''
+  selCatSlug = ''; selCommType = ''
+  const cf = document.getElementById('city-field')
+  if (cf) { cf.style.opacity = '1'; cf.style.pointerEvents = '' }
+  const co = document.getElementById('city-other-field')
+  if (co) co.style.display = 'none'
+}
+
+// ── HELPERS ──
+function toast(msg, isErr=false) {
+  const el = document.getElementById('toast')
+  document.getElementById('toast-msg').textContent = msg
+  el.className = 'toast' + (isErr ? ' error' : '')
+  el.querySelector('i').className = isErr ? 'ti ti-alert-circle' : 'ti ti-circle-check'
+  el.classList.add('show')
+  setTimeout(() => el.classList.remove('show'), 4000)
+}
+function esc(s) {
+  return String(s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;')
+}
+
+// ── REPORT MODAL ──
+let reportingCommunityId = null
+let selectedReason = null
+
+document.getElementById('report-trigger').addEventListener('click', () => {
+  if (!reportingCommunityId) return
+  selectedReason = null
+  document.querySelectorAll('.report-option').forEach(b => b.classList.remove('sel'))
+  document.getElementById('report-submit-btn').disabled = true
+  document.getElementById('report-overlay').classList.add('open')
+})
+
+function selReport(btn, reason) {
+  selectedReason = reason
+  document.querySelectorAll('.report-option').forEach(b => b.classList.remove('sel'))
+  btn.classList.add('sel')
+  document.getElementById('report-submit-btn').disabled = false
+}
+
+function closeReport() {
+  document.getElementById('report-overlay').classList.remove('open')
+}
+
+function closeReportOutside(e) {
+  if (e.target === document.getElementById('report-overlay')) closeReport()
+}
+
+async function submitReport() {
+  if (!reportingCommunityId || !selectedReason) return
+  const btn = document.getElementById('report-submit-btn')
+  btn.disabled = true
+  btn.textContent = 'Submitting…'
+  try {
+    await db.from('reports').insert({
+      community_id: reportingCommunityId,
+      reason: selectedReason,
+      status: 'open'
+    })
+    closeReport()
+    closeDetail()
+    toast('Thanks for reporting — we\'ll review it shortly.')
+  } catch(err) {
+    toast('Could not submit report — try again.', true)
+  } finally {
+    btn.disabled = false
+    btn.textContent = 'Submit Report'
+  }
+}
+
+// ── SAFE JOIN LINK (prevent non-whatsapp href) ──
+function safeJoinHref(url) {
+  try {
+    const u = new URL(url)
+    if (u.protocol === 'https:' && u.hostname === 'chat.whatsapp.com') return url
+  } catch {}
+  return '#'
+}
+
+// spinner CSS
+const st = document.createElement('style')
+st.textContent = '@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}'
+document.head.appendChild(st)
+
+init()
+</script>
+</body>
+</html>
