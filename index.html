@@ -1072,7 +1072,8 @@ function showSkeletons() {
 async function updateSidebarCounts() {
   const { count } = await db.from('communities')
     .select('*', { count:'exact', head:true }).eq('status','active')
-  document.getElementById('count-all').textContent = count || 0
+  const el = document.getElementById('count-all')
+  if (el) el.textContent = count || 0
 }
 
 // ── CONTROLS ──
