@@ -658,6 +658,24 @@ mixpanel.init('bd56a891f17bb6f6cd5be61a4399fd49', {track_pageview: true, persist
 </script>
 <!-- End Mixpanel -->
 
+<!-- Google Analytics GA4 -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-9F4PJSZW40"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-9F4PJSZW40', {
+    page_title: 'Close.Connect',
+    page_location: window.location.href
+  });
+  // helper to fire GA4 events safely
+  function gtrack(name, params) {
+    if (window.gtag) gtag('event', name, params || {});
+  }
+</script>
+<!-- End Google Analytics -->
+
+
 </head>
 <body>
 
@@ -1082,6 +1100,7 @@ function setCategory(slug, btn) {
   document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'))
   btn.classList.add('active')
   if (window.mixpanel) mixpanel.track('category_clicked', { category: slug })
+  gtrack('category_clicked', { category: slug })
   loadGrid()
 }
 function setFilter(f, btn) {
@@ -1106,6 +1125,7 @@ function changePage(dir) {
 async function trackClick(e, id) {
   e.stopPropagation()
   if (window.mixpanel) mixpanel.track('whatsapp_join_clicked', { community_id: id, referrer: document.referrer || 'direct' })
+  gtrack('whatsapp_join_clicked', { community_id: id })
   try {
     const sid = sessionStorage.getItem('cc_sid') || crypto.randomUUID()
     sessionStorage.setItem('cc_sid', sid)
@@ -1122,6 +1142,7 @@ async function trackClick(e, id) {
 // ── DETAIL MODAL ──
 async function openDetail(id) {
   if (window.mixpanel) mixpanel.track('community_card_opened', { community_id: id })
+  gtrack('community_card_opened', { community_id: id })
   const { data: c } = await db
     .from('communities')
     .select('*, categories(name,slug,emoji,color_bg,color_text)')
@@ -1283,6 +1304,7 @@ async function submitForm() {
     closeModal()
     toast('🎉 Community added! It\'s live now.')
     if (window.mixpanel) mixpanel.track('community_submitted', { category: selCatSlug, city: finalCity || 'none', type: selCommType || 'both' })
+    gtrack('community_submitted', { category: selCatSlug, city: finalCity || 'none', type: selCommType || 'both' })
     resetForm()
     page = 1; filter = 'all'; cat = 'all'
     document.querySelectorAll('.fpill').forEach(b=>b.classList.remove('on'))
