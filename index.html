@@ -1264,8 +1264,8 @@ function isValidWaLink(url) {
     if (u.hostname === 'chat.whatsapp.com' &&
         u.pathname.length > 1 &&
         /^\/[A-Za-z0-9_-]{10,}$/.test(u.pathname)) return true
-    // channel link: whatsapp.com/channel/XXXX
-    if (u.hostname === 'whatsapp.com' &&
+    // channel link: whatsapp.com/channel/XXXX or www.whatsapp.com/channel/XXXX
+    if ((u.hostname === 'whatsapp.com' || u.hostname === 'www.whatsapp.com') &&
         u.pathname.startsWith('/channel/') &&
         u.pathname.length > 10) return true
     return false
@@ -1515,7 +1515,7 @@ function safeJoinHref(url) {
     const u = new URL(url)
     if (u.protocol === 'https:' && (
       u.hostname === 'chat.whatsapp.com' ||
-      (u.hostname === 'whatsapp.com' && u.pathname.startsWith('/channel/'))
+      ((u.hostname === 'whatsapp.com' || u.hostname === 'www.whatsapp.com') && u.pathname.startsWith('/channel/'))
     )) return url
   } catch {}
   return '#'
