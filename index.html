@@ -193,19 +193,13 @@ button{cursor:pointer;font-family:inherit}
 .card{
   background:var(--surface);
   border:1px solid var(--border);
-  border-radius:16px;
-  padding:0;
+  border-radius:16px;padding:0;
   display:flex;flex-direction:column;
   transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease;
   position:relative;overflow:hidden;cursor:pointer;
-  box-shadow:0 1px 4px rgba(0,0,0,.06);
-  min-width:0;
+  box-shadow:0 1px 4px rgba(0,0,0,.06);min-width:0;
 }
-.card:hover{
-  transform:translateY(-4px);
-  box-shadow:0 12px 32px rgba(0,0,0,.1);
-  border-color:var(--border2);
-}
+.card:hover{transform:translateY(-4px);box-shadow:0 12px 32px rgba(0,0,0,.1);border-color:var(--border2)}
 .card:hover .card-banner img{transform:scale(1.05)}
 .card-banner{
   height:110px;width:100%;
@@ -222,65 +216,36 @@ button{cursor:pointer;font-family:inherit}
 .card-verified-badge{
   position:absolute;top:10px;left:10px;
   display:flex;align-items:center;gap:4px;
-  font-size:9px;font-weight:700;
-  padding:3px 8px;border-radius:999px;
+  font-size:9px;font-weight:700;padding:3px 8px;border-radius:999px;
   background:rgba(255,255,255,.9);color:var(--green);
   text-transform:uppercase;z-index:1;
 }
-.card-body{
-  padding:14px 16px 16px;
-  display:flex;flex-direction:column;gap:8px;flex:1;
-}
-.card-name{
-  font-size:14px;font-weight:700;color:var(--text);
-  line-height:1.3;letter-spacing:-.2px;
-}
+.card-body{padding:14px 16px 16px;display:flex;flex-direction:column;gap:8px;flex:1}
+.card-name{font-size:14px;font-weight:700;color:var(--text);line-height:1.3;letter-spacing:-.2px}
 .card-cat-pill{
   display:inline-flex;align-items:center;gap:4px;
-  font-size:10px;font-weight:700;
-  padding:3px 9px;border-radius:999px;
-  background:var(--surface2);color:var(--text3);
-  border:1px solid var(--border);width:fit-content;
+  font-size:10px;font-weight:700;padding:3px 9px;border-radius:999px;
+  background:var(--surface2);color:var(--text3);border:1px solid var(--border);width:fit-content;
 }
 .card-desc{
   font-size:12px;color:var(--text2);line-height:1.55;
-  display:-webkit-box;-webkit-line-clamp:2;
-  -webkit-box-orient:vertical;overflow:hidden;flex:1;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;flex:1;
 }
 .card-footer{
-  display:flex;align-items:center;
-  justify-content:space-between;
-  padding-top:10px;
-  border-top:1px solid var(--border);gap:8px;
-  margin-top:auto;flex-wrap:wrap;
+  display:flex;align-items:center;justify-content:space-between;
+  padding-top:10px;border-top:1px solid var(--border);gap:8px;margin-top:auto;flex-wrap:wrap;
 }
-.card-meta-row{
-  display:flex;align-items:center;gap:6px;
-  flex-wrap:wrap;min-width:0;flex:1;
-}
-.card-type-badge{
-  display:inline-flex;align-items:center;gap:3px;
-  font-size:10px;font-weight:600;padding:2px 8px;border-radius:999px;
-}
-.card-city-label{
-  font-size:10px;color:var(--text3);font-weight:500;
-  display:flex;align-items:center;gap:3px;
-}
+.card-meta-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap;min-width:0;flex:1}
+.card-type-badge{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:600;padding:2px 8px;border-radius:999px}
+.card-city-label{font-size:10px;color:var(--text3);font-weight:500;display:flex;align-items:center;gap:3px}
 .card-city-label i{font-size:10px}
 .wa-btn{
-  display:flex;align-items:center;gap:5px;
-  padding:7px 14px;
-  background:#25D366;border:none;
-  border-radius:999px;color:#fff;
-  font-size:12px;font-weight:700;
-  transition:all .15s;flex-shrink:0;
+  display:flex;align-items:center;gap:5px;padding:7px 14px;
+  background:#25D366;border:none;border-radius:999px;color:#fff;
+  font-size:12px;font-weight:700;transition:all .15s;flex-shrink:0;
   box-shadow:0 2px 8px rgba(37,211,102,.3);
 }
-.wa-btn:hover{
-  background:#1ebe5d;
-  box-shadow:0 4px 14px rgba(37,211,102,.4);
-  transform:scale(1.03);
-}
+.wa-btn:hover{background:#1ebe5d;box-shadow:0 4px 14px rgba(37,211,102,.4);transform:scale(1.03)}
 .wa-btn i{font-size:13px}
 .verified-dot{display:none}
 
@@ -818,7 +783,7 @@ mixpanel.init('bd56a891f17bb6f6cd5be61a4399fd49', {track_pageview: true, persist
       <label>WhatsApp Community Link</label>
       <div class="wa-input-wrap">
         <i class="ti ti-brand-whatsapp wa-prefix"></i>
-        <input type="text" id="f-link" placeholder="https://chat.whatsapp.com/…" maxlength="300" autocomplete="off"/>
+        <input type="text" id="f-link" placeholder="https://chat.whatsapp.com/…" maxlength="200" autocomplete="off"/>
       </div>
       <div class="field-hint">WhatsApp → Community info → Invite via link</div>
     </div>
@@ -886,6 +851,16 @@ mixpanel.init('bd56a891f17bb6f6cd5be61a4399fd49', {track_pageview: true, persist
       <select id="cat-select-form" class="field" style="margin-bottom:0">
         <option value="">select a category…</option>
       </select>
+    </div>
+    <div class="field">
+      <label>Additional Categories <span style="color:var(--text3);font-weight:400;font-size:10px">(optional)</span></label>
+      <select id="cat-select-secondary" class="field" style="margin-bottom:6px">
+        <option value="">none</option>
+      </select>
+      <select id="cat-select-tertiary" class="field" style="margin-bottom:0">
+        <option value="">none</option>
+      </select>
+      <div class="field-hint">Pick up to 2 more categories this community fits</div>
     </div>
     <div class="modal-btns">
       <button class="btn-cancel" onclick="closeModal()">Cancel</button>
@@ -963,35 +938,25 @@ const CAT_VISUALS = {
   business:    {grad:'linear-gradient(135deg,#172554 0%,#3b82f6 100%)',light:'#93c5fd'},
   lgbtq:       {grad:'linear-gradient(135deg,#7f1d1d 0%,#ec4899 100%)',light:'#fbcfe8'},
   jobs:        {grad:'linear-gradient(135deg,#0f172a 0%,#6366f1 100%)',light:'#a5b4fc'},
+  beauty:      {grad:'linear-gradient(135deg,#4a0a2e 0%,#ec4899 100%)',light:'#f9a8d4'},
+  shopping:    {grad:'linear-gradient(135deg,#1a0a3e 0%,#8b5cf6 100%)',light:'#ddd6fe'},
   other:       {grad:'linear-gradient(135deg,#1f2937 0%,#6b7280 100%)',light:'#d1d5db'},
   default:     {grad:'linear-gradient(135deg,#1a1a1a 0%,#374151 100%)',light:'#d1d5db'},
 }
-function getCatVisual(slug){ return CAT_VISUALS[slug]||CAT_VISUALS.default }
+function getCatVisual(slug){ return CAT_VISUALS[slug] || CAT_VISUALS.default }
 
-const CAT_IMAGES = {
-  sports:      ['https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=640&q=80','https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=640&q=80','https://images.unsplash.com/photo-1546519638-68e109498ffc?w=640&q=80','https://images.unsplash.com/photo-1552674605-db6ffd4facb5?w=640&q=80','https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=640&q=80'],
-  tech:        ['https://images.unsplash.com/photo-1518770660439-4636190af475?w=640&q=80','https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=640&q=80','https://images.unsplash.com/photo-1677442135703-1787eea5ce01?w=640&q=80','https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=640&q=80','https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=640&q=80'],
-  arts:        ['https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?w=640&q=80','https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=640&q=80','https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?w=640&q=80','https://images.unsplash.com/photo-1561214115-f2f134cc4912?w=640&q=80','https://images.unsplash.com/photo-1578926288207-a90a5366b7b3?w=640&q=80'],
-  food:        ['https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=640&q=80','https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=640&q=80','https://images.unsplash.com/photo-1476224203421-9ac39bcb3327?w=640&q=80','https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=640&q=80','https://images.unsplash.com/photo-1455619452474-d2be8b1e70cd?w=640&q=80'],
-  music:       ['https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=640&q=80','https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=640&q=80','https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=640&q=80','https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?w=640&q=80','https://images.unsplash.com/photo-1415201364774-f6f0bb35f28f?w=640&q=80'],
-  wellness:    ['https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=640&q=80','https://images.unsplash.com/photo-1545205597-3d9d02c29597?w=640&q=80','https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=640&q=80','https://images.unsplash.com/photo-1559595500-e15296d1b8a4?w=640&q=80','https://images.unsplash.com/photo-1588286840104-8957b019727f?w=640&q=80'],
-  gaming:      ['https://images.unsplash.com/photo-1542751371-adc38448a05e?w=640&q=80','https://images.unsplash.com/photo-1593305841991-05c297ba4575?w=640&q=80','https://images.unsplash.com/photo-1552820728-8b83bb6b773f?w=640&q=80','https://images.unsplash.com/photo-1538481199705-c710c4e965fc?w=640&q=80','https://images.unsplash.com/photo-1586182987320-4f376d39d787?w=640&q=80'],
-  travel:      ['https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=640&q=80','https://images.unsplash.com/photo-1506197603052-3cc9c3a201bd?w=640&q=80','https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=640&q=80','https://images.unsplash.com/photo-1503220317375-aaad61436b1b?w=640&q=80','https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=640&q=80'],
-  photography: ['https://images.unsplash.com/photo-1452587925148-ce544e77e70d?w=640&q=80','https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=640&q=80','https://images.unsplash.com/photo-1502920917128-1aa500764cbd?w=640&q=80','https://images.unsplash.com/photo-1542038784456-1ea8e935640e?w=640&q=80','https://images.unsplash.com/photo-1471341971476-ae15ff5dd4ea?w=640&q=80'],
-  social:      ['https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=640&q=80','https://images.unsplash.com/photo-1543269865-cbf427effbad?w=640&q=80','https://images.unsplash.com/photo-1511632765486-a01980e01a18?w=640&q=80','https://images.unsplash.com/photo-1528605248644-14dd04022da1?w=640&q=80','https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=640&q=80'],
-  books:       ['https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=640&q=80','https://images.unsplash.com/photo-1512820790803-83ca734da794?w=640&q=80','https://images.unsplash.com/photo-1495446815901-a7297e633e8d?w=640&q=80','https://images.unsplash.com/photo-1507842217343-583bb7270b66?w=640&q=80','https://images.unsplash.com/photo-1521587760476-6c12a4b040da?w=640&q=80'],
-  pets:        ['https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=640&q=80','https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=640&q=80','https://images.unsplash.com/photo-1548767797-d8c844163c4a?w=640&q=80','https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?w=640&q=80','https://images.unsplash.com/photo-1561037404-61cd46aa615b?w=640&q=80'],
-  parenting:   ['https://images.unsplash.com/photo-1491013516836-7db643ee125a?w=640&q=80','https://images.unsplash.com/photo-1555252333-9f8e92e65df9?w=640&q=80','https://images.unsplash.com/photo-1476703993599-0035a21b17a9?w=640&q=80','https://images.unsplash.com/photo-1520458555-46542628b8c2?w=640&q=80','https://images.unsplash.com/photo-1536640712-4d4c36ff0e4e?w=640&q=80'],
-  education:   ['https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=640&q=80','https://images.unsplash.com/photo-1427504494785-3a9ca7044f45?w=640&q=80','https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=640&q=80','https://images.unsplash.com/photo-1509062522246-3755977927d7?w=640&q=80','https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=640&q=80'],
-  finance:     ['https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=640&q=80','https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?w=640&q=80','https://images.unsplash.com/photo-1563986768609-322da13575f3?w=640&q=80','https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=640&q=80','https://images.unsplash.com/photo-1518458028785-8fbcd101ebb9?w=640&q=80'],
-  business:    ['https://images.unsplash.com/photo-1521737711867-e3b97375f902?w=640&q=80','https://images.unsplash.com/photo-1556761175-4b46a572b786?w=640&q=80','https://images.unsplash.com/photo-1553877522-43269d4ea984?w=640&q=80','https://images.unsplash.com/photo-1497366216548-37526070297c?w=640&q=80','https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=640&q=80'],
-  lgbtq:       ['https://images.unsplash.com/photo-1620841405809-f33f67bdef4e?w=640&q=80','https://images.unsplash.com/photo-1617870355001-a68d6bea6e5d?w=640&q=80','https://images.unsplash.com/photo-1600565193348-f74bd3c7ccdf?w=640&q=80','https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=640&q=80','https://images.unsplash.com/photo-1559734840-f9509ee5677f?w=640&q=80'],
-  jobs:        ['https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=640&q=80','https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=640&q=80','https://images.unsplash.com/photo-1499750310107-5fef28a66643?w=640&q=80','https://images.unsplash.com/photo-1521791136064-7986c2920216?w=640&q=80','https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=640&q=80'],
-  other:       ['https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=640&q=80','https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=640&q=80','https://images.unsplash.com/photo-1517457373958-b7bdd4587205?w=640&q=80','https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?w=640&q=80','https://images.unsplash.com/photo-1491438590914-bc09fcaaf77a?w=640&q=80'],
+// ── CATEGORY IMAGES — self-hosted SVGs ──
+const CAT_SVG_SLUGS = {
+  sports:'sports', tech:'tech', arts:'arts', food:'food',
+  music:'music', wellness:'wellness', gaming:'gaming', travel:'travel',
+  photography:'photography', social:'social', books:'books', pets:'pets',
+  parenting:'parenting', education:'education', finance:'finance',
+  business:'business', lgbtq:'lgbtq', jobs:'jobs',
+  beauty:'beauty', shopping:'shopping', other:'other'
 }
-function getCatImage(slug,seed){
-  var imgs=CAT_IMAGES[slug]||CAT_IMAGES.other
-  return imgs[Math.abs(seed||0)%imgs.length]
+function getCatImage(slug) {
+  var s = CAT_SVG_SLUGS[slug] || 'other'
+  return 'images/categories/' + s + '.svg'
 }
 
 // ── SIDEBAR ICONS ──
@@ -1002,6 +967,7 @@ const CAT_ICONS = {
   social:'ti-confetti', books:'ti-book', pets:'ti-paw',
   parenting:'ti-baby-carriage', education:'ti-school', finance:'ti-coin',
   business:'ti-briefcase', lgbtq:'ti-heart-handshake', jobs:'ti-building',
+  beauty:'ti-sparkles', shopping:'ti-shopping-bag',
   other:'ti-dots'
 }
 
@@ -1040,6 +1006,17 @@ function buildCatPills() {
     sel.appendChild(opt)
   })
   sel.onchange = () => { selCatSlug = sel.value }
+  ;['cat-select-secondary','cat-select-tertiary'].forEach(function(id) {
+    var s = document.getElementById(id)
+    if (!s) return
+    s.innerHTML = '<option value="">none</option>'
+    cats.forEach(function(c) {
+      var o = document.createElement('option')
+      o.value = c.slug
+      o.textContent = (c.emoji||'') + ' ' + c.name
+      s.appendChild(o)
+    })
+  })
 }
 
 // ── LOAD GRID ──
@@ -1047,7 +1024,7 @@ async function loadGrid(append) {
   if (isLoading) return
   isLoading = true
   if (!append) { page = 1; allLoaded = false; showSkeletons() }
-  const status = document.getElementById('scroll-status')
+  var status = document.getElementById('scroll-status')
   if (status) status.textContent = ''
 
   let query = db
@@ -1059,6 +1036,7 @@ async function loadGrid(append) {
   if (filterType !== 'all') query = query.eq('community_type', filterType)
   if (filterCity) query = query.ilike('city', filterCity)
 
+  // ── category filter — DB level using category_id ──
   if (cat !== 'all') {
     const catObj = cats.find(c => c.slug === cat)
     if (catObj) query = query.eq('category_id', catObj.id)
@@ -1084,13 +1062,27 @@ async function loadGrid(append) {
   if (!append) updateSidebarCounts()
 }
 
+
+// ── LINKIFY — make URLs and @handles clickable ──
+function linkify(text) {
+  var escaped = esc(text)
+  escaped = escaped.replace(
+    /(https?:\/\/[^\s<>"&]+)/g,
+    '<a href="$1" target="_blank" rel="noopener noreferrer" style="color:var(--green);text-decoration:underline;word-break:break-all" onclick="event.stopPropagation()">$1</a>'
+  )
+  escaped = escaped.replace(
+    /@([A-Za-z0-9_.]{1,30})/g,
+    '<a href="https://instagram.com/$1" target="_blank" rel="noopener noreferrer" style="color:var(--green);font-weight:500" onclick="event.stopPropagation()">@$1</a>'
+  )
+  return escaped
+}
+
 // ── BUILD CARD ──
 function buildCard(c) {
   var ct  = c.categories || {}
   var vis = getCatVisual(ct.slug || 'default')
   var isNew = Date.now() - new Date(c.created_at) < 7*24*60*60*1000
-  var seed = (c.id||'x').charCodeAt(0)||0
-  var imgSrc = getCatImage(ct.slug, seed)
+  var imgSrc = getCatImage(ct.slug)
   var typeBadge = c.community_type === 'online'
     ? '<span class="card-type-badge" style="background:#e8f8ee;color:#1a7a5e"><span style="width:6px;height:6px;border-radius:50%;background:#25D366;display:inline-block;margin-right:3px"></span>Online</span>'
     : c.community_type === 'offline'
@@ -1100,6 +1092,13 @@ function buildCard(c) {
   var newBadge = isNew ? '<span class="card-new-badge">New</span>' : ''
   var verBadge = c.is_verified ? '<span class="card-verified-badge"><i class="ti ti-circle-check"></i>Verified</span>' : ''
   var id = c.id
+  var extraPills = ''
+  if (c.extra_categories && c.extra_categories.length) {
+    c.extra_categories.forEach(function(slug) {
+      var ec = cats.find(function(x){ return x.slug === slug })
+      if (ec) extraPills += '<span class="card-cat-pill" style="opacity:.75">' + esc(ec.name) + '</span>'
+    })
+  }
   var parts = []
   parts.push('<div class="card" onclick="openDetail(\'' + id + '\')">')
   parts.push('<div class="card-banner" style="background:' + vis.grad + '">')
@@ -1108,8 +1107,8 @@ function buildCard(c) {
   parts.push(newBadge + verBadge + '</div>')
   parts.push('<div class="card-body">')
   parts.push('<div class="card-name">' + esc(c.name) + '</div>')
-  parts.push('<span class="card-cat-pill">' + esc(ct.name||'Community') + '</span>')
-  parts.push('<div class="card-desc">' + esc(c.description||'') + '</div>')
+  parts.push('<div style="display:flex;gap:4px;flex-wrap:wrap">' + '<span class="card-cat-pill">' + esc(ct.name||'Community') + '</span>' + extraPills + '</div>')
+  parts.push('<div class="card-desc">' + linkify(c.description||'') + '</div>')
   parts.push('<div class="card-footer">')
   parts.push('<div class="card-meta-row">' + typeBadge + cityHtml + '</div>')
   parts.push('<a href="' + safeJoinHref(c.whatsapp_link) + '" target="_blank" rel="noopener noreferrer" class="wa-btn" onclick="trackClick(event,\'' + id + '\')">')
@@ -1128,16 +1127,16 @@ function renderGrid(list) {
   grid.innerHTML = list.map(function(c){ return buildCard(c) }).join('')
 }
 
-// ── APPEND GRID (infinite scroll) ──
+// ── APPEND GRID ──
 function appendGrid(list) {
   if (!list.length) return
   var grid = document.getElementById('community-grid')
-  var html = list.map(function(c){ return buildCard(c) }).join('')
-  grid.insertAdjacentHTML('beforeend', html)
+  grid.insertAdjacentHTML('beforeend', list.map(function(c){ return buildCard(c) }).join(''))
 }
 
-// ── PAGINATION (no-op) ──
+// ── PAGINATION (no-op — replaced by infinite scroll) ──
 function renderPagination() {}
+
 
 // ── SKELETON ──
 function showSkeletons() {
@@ -1220,7 +1219,7 @@ async function openDetail(id) {
   if (!c) return
   const ct = c.categories || {}
   var dmVis = getCatVisual(ct.slug)
-  var dmImg = getCatImage(ct.slug, (c.id||'x').charCodeAt(0)||0)
+  var dmImg = getCatImage(ct.slug)
   var dmBanner = document.getElementById('dm-banner')
   dmBanner.style.background = dmVis.grad
   var dmBannerImg = document.getElementById('dm-banner-img')
@@ -1228,10 +1227,18 @@ async function openDetail(id) {
   document.getElementById('dm-name').textContent = c.name
   document.getElementById('dm-verified').style.display = c.is_verified ? 'flex' : 'none'
   const isNew = Date.now() - new Date(c.created_at) < 7*24*60*60*1000
+  var extraTagsHtml = ''
+  if (c.extra_categories && c.extra_categories.length) {
+    c.extra_categories.forEach(function(slug) {
+      var ec = cats.find(function(x){ return x.slug === slug })
+      if (ec) extraTagsHtml += '<span class="detail-tag" style="background:' + (ec.color_bg||'#f4f3f0') + ';color:' + (ec.color_text||'#666') + '">' + esc(ec.name) + '</span>'
+    })
+  }
   document.getElementById('dm-tags').innerHTML =
-    `<span class="detail-tag" style="background:${ct.color_bg||'#1a1a1a'};color:${ct.color_text||'#888'}">${esc(ct.name||'')}</span>` +
+    '<span class="detail-tag" style="background:' + (ct.color_bg||'#1a1a1a') + ';color:' + (ct.color_text||'#888') + '">' + esc(ct.name||'') + '</span>' +
+    extraTagsHtml +
     (isNew ? '<span class="detail-new">new</span>' : '')
-  document.getElementById('dm-desc').textContent = c.description || ''
+  document.getElementById('dm-desc').innerHTML = linkify(c.description || '')
   const typeLabel = c.community_type === 'online' ? 'online' : c.community_type === 'offline' ? 'offline' : 'online & offline'
   const typeIcon = c.community_type === 'online' ? 'ti-wifi' : c.community_type === 'offline' ? 'ti-map-pin' : 'ti-world'
   document.getElementById('dm-meta').innerHTML = `
@@ -1290,14 +1297,10 @@ function checkRateLimit() {
 function isValidWaLink(url) {
   try {
     const u = new URL(url)
-    if (u.protocol !== 'https:') return false
-    if (u.hostname === 'chat.whatsapp.com' &&
-        u.pathname.length > 1 &&
-        /^\/[A-Za-z0-9_-]{10,}$/.test(u.pathname)) return true
-    if ((u.hostname === 'whatsapp.com' || u.hostname === 'www.whatsapp.com') &&
-        u.pathname.startsWith('/channel/') &&
-        u.pathname.length > 10) return true
-    return false
+    return u.protocol === 'https:' &&
+           u.hostname === 'chat.whatsapp.com' &&
+           u.pathname.length > 1 &&
+           /^\/[A-Za-z0-9_-]{10,}$/.test(u.pathname)
   } catch { return false }
 }
 
@@ -1352,6 +1355,9 @@ async function submitForm() {
 
   try {
     const catMatch = cats.find(c => c.slug === selCatSlug)
+    const sec = document.getElementById('cat-select-secondary')?.value || ''
+    const ter = document.getElementById('cat-select-tertiary')?.value || ''
+    const extraCats = [sec, ter].filter(Boolean).filter(function(s){ return s !== selCatSlug })
     // resolve city
     const rawCity = document.getElementById('f-city')?.value || ''
     const cityOtherVal = document.getElementById('f-city-other')?.value.trim() || ''
@@ -1364,6 +1370,7 @@ async function submitForm() {
       submitted_by_name: creator || null,
       submitted_by_email: null,
       community_type: selCommType || 'both',
+      extra_categories: extraCats.length ? extraCats : null,
       city: finalCity || null,
       status: 'active'
     })
@@ -1467,6 +1474,7 @@ function resetForm() {
   document.querySelectorAll('.toggle-opt').forEach(b => b.classList.remove('sel-online','sel-offline','sel-both'))
   const catSel = document.getElementById('cat-select-form'); if (catSel) catSel.value = ''
   selCatSlug = ''; selCommType = ''
+  ;['cat-select-secondary','cat-select-tertiary'].forEach(function(id){ var s=document.getElementById(id); if(s) s.value='' })
   const cf = document.getElementById('city-field')
   if (cf) { cf.style.opacity = '1'; cf.style.pointerEvents = '' }
   const co = document.getElementById('city-other-field')
