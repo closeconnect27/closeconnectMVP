@@ -587,6 +587,21 @@ button{cursor:pointer;font-family:inherit}
   box-shadow:0 0 0 3px rgba(26,122,94,.08);
 }
 
+/* ── LINK TYPE TOGGLE ── */
+.link-type-row{display:flex;gap:8px;margin-bottom:10px}
+.link-type-btn{
+  flex:1;padding:8px;border-radius:var(--radius-sm);
+  border:1.5px solid var(--border2);background:var(--surface);
+  font-size:11px;font-weight:500;color:var(--text2);
+  cursor:pointer;text-align:center;transition:all .12s;
+  display:flex;align-items:center;justify-content:center;gap:5px;
+}
+.link-type-btn i{font-size:13px}
+.link-type-btn:hover{border-color:var(--text3);color:var(--text);background:var(--surface2)}
+.link-type-btn.sel-community{background:#e8f8ee;border-color:#25D366;color:#1a7a5e;font-weight:600}
+.link-type-btn.sel-channel{background:#f3f0ff;border-color:#7c3aed;color:#7c3aed;font-weight:600}
+.link-type-btn.sel-instagram{background:#fff0f9;border-color:#e1306c;color:#e1306c;font-weight:600}
+
 /* ── ONLINE TOGGLE IN FORM ── */
 .toggle-row{
   display:flex;gap:8px;margin-top:4px;
@@ -779,13 +794,24 @@ mixpanel.init('bd56a891f17bb6f6cd5be61a4399fd49', {track_pageview: true, persist
       </div>
       <button class="modal-close" onclick="closeModal()"><i class="ti ti-x"></i></button>
     </div>
-    <div class="field">
-      <label>WhatsApp Community Link</label>
-      <div class="wa-input-wrap">
-        <i class="ti ti-brand-whatsapp wa-prefix"></i>
-        <input type="text" id="f-link" placeholder="https://chat.whatsapp.com/…" maxlength="200" autocomplete="off"/>
+        <div class="field">
+      <label>Link Type</label>
+      <div class="link-type-row">
+        <button type="button" class="link-type-btn sel-community" id="ltype-community" onclick="setLinkType('community')">
+          <i class="ti ti-users"></i>Community
+        </button>
+        <button type="button" class="link-type-btn" id="ltype-channel" onclick="setLinkType('channel')">
+          <i class="ti ti-speakerphone"></i>Channel
+        </button>
+        <button type="button" class="link-type-btn" id="ltype-instagram" onclick="setLinkType('instagram')">
+          <i class="ti ti-brand-instagram"></i>Instagram
+        </button>
       </div>
-      <div class="field-hint">WhatsApp → Community info → Invite via link</div>
+      <div class="wa-input-wrap">
+        <i class="ti ti-brand-whatsapp wa-prefix" id="f-link-icon"></i>
+        <input type="text" id="f-link" placeholder="https://chat.whatsapp.com/…" maxlength="300" autocomplete="off"/>
+      </div>
+      <div class="field-hint" id="link-hint">WhatsApp → Community info → Invite via link</div>
     </div>
     <div class="field">
       <label>Community Name</label>
@@ -915,7 +941,7 @@ const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON)
 const PER_PAGE = 16
 let page = 1, cat = 'all', filter = 'all', q = '', selCatSlug = ''
 let cats = [], total = 0
-let filterType = 'all', filterCity = '', selCommType = ''
+let filterType = 'all', filterCity = '', selCommType = '', selLinkType = 'community'
 let isLoading = false, allLoaded = false
 
 // ── CATEGORY VISUALS ──
@@ -1267,6 +1293,11 @@ async function openDetail(id) {
   const btn = document.getElementById('dm-join-btn')
   btn.href = safeJoinHref(c.whatsapp_link)
   btn.onclick = (e) => trackClick(e, c.id)
+  const isInsta = c.whatsapp_link && (c.whatsapp_link.includes('instagram.com'))
+  btn.innerHTML = isInsta
+    ? '<i class="ti ti-brand-instagram" style="font-size:20px"></i>View on Instagram'
+    : '<i class="ti ti-brand-whatsapp" style="font-size:20px"></i>Join on WhatsApp'
+  document.getElementById('dm-hint') && (document.getElementById('dm-hint').textContent = isInsta ? 'Opens Instagram' : 'Opens WhatsApp — Free to Join')
   document.getElementById('detail-overlay').classList.add('open')
   document.body.style.overflow = 'hidden'
 }
@@ -1311,13 +1342,50 @@ function checkRateLimit() {
 }
 
 // ── STRICT WHATSAPP URL VALIDATOR ──
+// ── LINK TYPE TOGGLE ──
+function setLinkType(type) {
+  selLinkType = type
+  document.querySelectorAll('.link-type-btn').forEach(function(b) {
+    b.classList.remove('sel-community','sel-channel','sel-instagram')
+  })
+  document.getElementById('ltype-' + type).classList.add('sel-' + type)
+  var input = document.getElementById('f-link')
+  var hint  = document.getElementById('link-hint')
+  var icon  = document.getElementById('f-link-icon')
+  if (type === 'community') {
+    input.placeholder = 'https://chat.whatsapp.com/…'
+    hint.textContent  = 'WhatsApp → Community info → Invite via link'
+    icon.className = 'ti ti-brand-whatsapp wa-prefix'
+    icon.style.color = 'var(--wa)'
+  } else if (type === 'channel') {
+    input.placeholder = 'https://whatsapp.com/channel/…'
+    hint.textContent  = 'WhatsApp Channel → Invite to channel → Copy link'
+    icon.className = 'ti ti-brand-whatsapp wa-prefix'
+    icon.style.color = 'var(--wa)'
+  } else {
+    input.placeholder = 'https://www.instagram.com/yourcommunity'
+    hint.textContent  = 'Instagram profile or page link for your community'
+    icon.className = 'ti ti-brand-instagram wa-prefix'
+    icon.style.color = '#e1306c'
+  }
+  input.value = ''
+  input.focus()
+}
+
 function isValidWaLink(url) {
   try {
     const u = new URL(url)
-    return u.protocol === 'https:' &&
-           u.hostname === 'chat.whatsapp.com' &&
-           u.pathname.length > 1 &&
-           /^\/[A-Za-z0-9_-]{10,}$/.test(u.pathname)
+    if (u.protocol !== 'https:') return false
+    // WhatsApp community
+    if (u.hostname === 'chat.whatsapp.com' && u.pathname.length > 1 &&
+        /^\/[A-Za-z0-9_-]{10,}$/.test(u.pathname)) return true
+    // WhatsApp channel
+    if ((u.hostname === 'whatsapp.com' || u.hostname === 'www.whatsapp.com') &&
+        u.pathname.startsWith('/channel/') && u.pathname.length > 10) return true
+    // Instagram
+    if ((u.hostname === 'instagram.com' || u.hostname === 'www.instagram.com') &&
+        u.pathname.length > 1) return true
+    return false
   } catch { return false }
 }
 
@@ -1339,7 +1407,7 @@ async function submitForm() {
 
   // ── 2. strict WhatsApp URL check ──
   if (!isValidWaLink(rawLink)) {
-    toast('Please enter a valid WhatsApp community link.', true); return
+    toast('Please enter a valid WhatsApp or Instagram link.', true); return
   }
 
   // ── 3. length checks ──
@@ -1394,7 +1462,7 @@ async function submitForm() {
     if (error) {
       // DB constraint violation — bad link or length
       if (error.code === '23514') {
-        toast('Invalid WhatsApp link — only chat.whatsapp.com links allowed.', true)
+        toast('Invalid link — please check the URL format.', true)
       } else if (error.code === '23505') {
         toast('This community is already listed!', true)
       } else {
@@ -1490,7 +1558,8 @@ function resetForm() {
   })
   document.querySelectorAll('.toggle-opt').forEach(b => b.classList.remove('sel-online','sel-offline','sel-both'))
   const catSel = document.getElementById('cat-select-form'); if (catSel) catSel.value = ''
-  selCatSlug = ''; selCommType = ''
+  selCatSlug = ''; selCommType = ''; selLinkType = 'community'
+  if (typeof setLinkType === 'function') setLinkType('community')
   ;['cat-select-secondary','cat-select-tertiary'].forEach(function(id){ var s=document.getElementById(id); if(s) s.value='' })
   const cf = document.getElementById('city-field')
   if (cf) { cf.style.opacity = '1'; cf.style.pointerEvents = '' }
@@ -1568,7 +1637,8 @@ function safeJoinHref(url) {
     const u = new URL(url)
     if (u.protocol === 'https:' && (
       u.hostname === 'chat.whatsapp.com' ||
-      ((u.hostname === 'whatsapp.com' || u.hostname === 'www.whatsapp.com') && u.pathname.startsWith('/channel/'))
+      ((u.hostname === 'whatsapp.com' || u.hostname === 'www.whatsapp.com') && u.pathname.startsWith('/channel/')) ||
+      u.hostname === 'instagram.com' || u.hostname === 'www.instagram.com'
     )) return url
   } catch {}
   return '#'
