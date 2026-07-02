@@ -458,6 +458,24 @@ footer{border-top:1px solid var(--border);padding:24px 32px;max-width:1600px;mar
         <div class="field-hint" id="ev-desc-count" style="text-align:right">0 / 500</div>
       </div>
       <div class="field">
+        <label>Payment <span style="color:var(--text3);font-weight:400;text-transform:none">(optional — leave blank if free)</span></label>
+        <div class="paytype-row">
+          <button type="button" class="paytype-btn" id="pt-upi" onclick="setPayType('upi')"><i class="ti ti-brand-google-pay"></i>UPI ID</button>
+          <button type="button" class="paytype-btn" id="pt-qr_url" onclick="setPayType('qr_url')"><i class="ti ti-qrcode"></i>QR Image URL</button>
+          <button type="button" class="paytype-btn" id="pt-link" onclick="setPayType('link')"><i class="ti ti-link"></i>Payment Link</button>
+        </div>
+        <input type="text" id="ev-pay-value" placeholder="e.g. yourname@okhdfcbank" maxlength="300"/>
+        <div id="qr-upload-row" style="display:none;margin-top:8px">
+          <label style="display:flex;align-items:center;gap:8px;padding:10px 14px;border:1.5px dashed var(--border2);border-radius:var(--radius-sm);cursor:pointer;font-size:12px;color:var(--text2);font-weight:600">
+            <i class="ti ti-upload" style="font-size:16px"></i>
+            <span id="qr-upload-label">Or upload a QR image instead</span>
+            <input type="file" id="qr-file-input" accept="image/*" style="display:none" onchange="uploadQr(this)"/>
+          </label>
+          <img id="qr-preview-thumb" style="display:none;max-width:120px;border-radius:8px;border:1px solid var(--border);margin-top:8px"/>
+        </div>
+        <div class="field-hint" id="pay-hint">Select a payment type above if this event isn't free.</div>
+      </div>
+      <div class="field">
         <label>Registration Form</label>
         <div class="field-hint" style="margin-bottom:10px">Choose what you want to ask attendees when they register.</div>
         <div id="field-builder"></div>
@@ -627,6 +645,7 @@ let allCommunities = []
 let filters = { category:'', city:'', community:'', from:'', to:'' }
 let page = 0, PER_PAGE = 18, isLoading = false, allLoaded = false
 let formFields = []
+let selPayType = ''
 let currentDetailEventForRegister = null
 
 // ── INIT ──
@@ -754,6 +773,38 @@ document.addEventListener('DOMContentLoaded', () => {
   })
 })
 
+function setPayType(type) {
+  selPayType = (selPayType === type) ? '' : type
+  document.querySelectorAll('.paytype-btn').forEach(b => b.classList.remove('sel-upi','sel-qr_url','sel-link'))
+  const input = document.getElementById('ev-pay-value')
+  const hint = document.getElementById('pay-hint')
+  const uploadRow = document.getElementById('qr-upload-row')
+  if (!selPayType) { hint.textContent = "Select a payment type above if this event isn't free."; input.placeholder = ''; uploadRow.style.display = 'none'; return }
+  document.getElementById('pt-' + selPayType).classList.add('sel-' + selPayType)
+  if (selPayType === 'upi') { input.placeholder = 'e.g. yourname@okhdfcbank'; hint.textContent = 'Your UPI ID — attendees will copy this to pay.'; uploadRow.style.display = 'none' }
+  else if (selPayType === 'qr_url') { input.placeholder = 'https://…/your-qr-code.png (or upload below)'; hint.textContent = 'Paste a link to your QR image, or upload one directly.'; uploadRow.style.display = 'block' }
+  else { input.placeholder = 'https://razorpay.me/… or similar'; hint.textContent = 'A payment link attendees can open directly.'; uploadRow.style.display = 'none' }
+}
+
+async function uploadQr(inputEl) {
+  const file = inputEl.files[0]
+  if (!file) return
+  if (!session) { toast('Please sign in first.', true); inputEl.value = ''; return }
+  if (file.size > 3 * 1024 * 1024) { toast('Image must be under 3MB.', true); inputEl.value = ''; return }
+  const label = document.getElementById('qr-upload-label')
+  label.textContent = 'Uploading…'
+  const ext = (file.name.split('.').pop() || 'png').toLowerCase()
+  const path = session.user.id + '/' + Date.now() + '.' + ext
+  const { error } = await db.storage.from('event-qr').upload(path, file, { upsert: false })
+  if (error) { toast('Upload failed — try again.', true); label.textContent = 'Or upload a QR image instead'; inputEl.value = ''; return }
+  const { data: pub } = db.storage.from('event-qr').getPublicUrl(path)
+  document.getElementById('ev-pay-value').value = pub.publicUrl
+  const thumb = document.getElementById('qr-preview-thumb')
+  thumb.src = pub.publicUrl
+  thumb.style.display = 'block'
+  label.textContent = 'Uploaded ✓ — choose a different file to replace'
+}
+
 const FIELD_TYPE_LABELS = { text:'Short answer', textarea:'Long answer', email:'Email', phone:'Phone number', number:'Number', select:'Multiple choice' }
 
 function resetFormFields() {
@@ -771,10 +822,16 @@ function removeFormField(idx) {
   formFields.splice(idx, 1)
   renderFieldBuilder()
 }
-function updateFormField(idx, key, value) {
-  formFields[idx][key] = value
-  if (key === 'field_type' && value !== 'select') formFields[idx].options = []
+function updateFormFieldLabel(idx, value) {
+  formFields[idx].label = value
+}
+function updateFormFieldType(idx, value) {
+  formFields[idx].field_type = value
+  if (value !== 'select') formFields[idx].options = []
   renderFieldBuilder()
+}
+function updateFormFieldRequired(idx, checked) {
+  formFields[idx].is_required = checked
 }
 function updateFormFieldOptions(idx, value) {
   formFields[idx].options = value.split(',').map(s => s.trim()).filter(Boolean)
@@ -785,12 +842,12 @@ function renderFieldBuilder() {
   el.innerHTML = formFields.map((f, idx) => `
     <div class="fb-row">
       <div class="fb-row-main">
-        <input type="text" placeholder="Question label — e.g. Name" value="${esc(f.label)}" oninput="updateFormField(${idx},'label',this.value)"/>
+        <input type="text" placeholder="Question label — e.g. Name" value="${esc(f.label)}" oninput="updateFormFieldLabel(${idx},this.value)"/>
         <div class="fb-row-controls">
-          <select onchange="updateFormField(${idx},'field_type',this.value)">
+          <select onchange="updateFormFieldType(${idx},this.value)">
             ${Object.entries(FIELD_TYPE_LABELS).map(([v,l]) => `<option value="${v}" ${f.field_type===v?'selected':''}>${l}</option>`).join('')}
           </select>
-          <label class="fb-required"><input type="checkbox" ${f.is_required?'checked':''} onchange="updateFormField(${idx},'is_required',this.checked)"/> Required</label>
+          <label class="fb-required"><input type="checkbox" ${f.is_required?'checked':''} onchange="updateFormFieldRequired(${idx},this.checked)"/> Required</label>
         </div>
         ${f.field_type === 'select' ? `<input type="text" placeholder="Options, comma separated — e.g. Yes, No" value="${esc((f.options||[]).join(', '))}" oninput="updateFormFieldOptions(${idx},this.value)"/>` : ''}
       </div>
@@ -811,12 +868,14 @@ async function submitEvent() {
   const city = document.getElementById('ev-city').value
   const category = document.getElementById('ev-category').value
   const desc = sanitise(document.getElementById('ev-desc').value.trim(), 500)
+  const payValue = sanitise(document.getElementById('ev-pay-value').value.trim(), 300)
 
   if (!communityId || !name || !date || !venue || !city || !category) {
     toast('Please fill in all required fields.', true); return
   }
   if (name.length < 3) { toast('Event name is too short.', true); return }
   if (desc && desc.length < 10) { toast('Description should be at least 10 characters, or left blank.', true); return }
+  if (selPayType && !payValue) { toast('Add a payment value, or clear the payment type.', true); return }
   const cleanFields = formFields.filter(f => f.label.trim())
   if (!cleanFields.length) { toast('Add at least one registration question (Name is a good start).', true); return }
 
@@ -832,6 +891,8 @@ async function submitEvent() {
     city: city,
     category: category,
     hosted_by_community_id: communityId,
+    payment_type: selPayType || null,
+    payment_value: selPayType ? payValue : null,
     description: desc || null,
     created_by_user_id: session.user.id,
     status: 'active'
@@ -864,8 +925,14 @@ async function submitEvent() {
   loadEvents()
 }
 function resetEventForm() {
-  ['ev-name','ev-date','ev-time','ev-venue','ev-desc'].forEach(id => { const el = document.getElementById(id); if (el) el.value = '' })
+  ['ev-name','ev-date','ev-time','ev-venue','ev-desc','ev-pay-value'].forEach(id => { const el = document.getElementById(id); if (el) el.value = '' })
   document.getElementById('ev-desc-count').textContent = '0 / 500'
+  document.querySelectorAll('.paytype-btn').forEach(b => b.classList.remove('sel-upi','sel-qr_url','sel-link'))
+  selPayType = ''
+  document.getElementById('qr-upload-row').style.display = 'none'
+  document.getElementById('qr-preview-thumb').style.display = 'none'
+  document.getElementById('qr-file-input').value = ''
+  document.getElementById('qr-upload-label').textContent = 'Or upload a QR image instead'
   resetFormFields()
 }
 
@@ -1087,6 +1154,10 @@ function setupInfiniteScroll() {
   obs.observe(sentinel)
 }
 
+function copyUpi(id) {
+  navigator.clipboard.writeText(id).then(() => toast('UPI ID copied: ' + id))
+}
+
 // ── DETAIL MODAL ──
 let currentDetailEvent = null
 async function openDetail(id) {
@@ -1107,7 +1178,15 @@ async function openDetail(id) {
   document.getElementById('dm-desc').textContent = ev.description || 'No description provided.'
 
   const isOwner = session && (ev.created_by_user_id === session.user.id || session.user.id === ADMIN_UID)
-  let footer = '<button class="detail-pay-btn link" onclick="openRegister(\''+ev.id+'\')"><i class="ti ti-clipboard-list"></i>Register For This Event</button>'
+  let footer = ''
+  if (ev.payment_type === 'upi') {
+    footer += '<div style="text-align:center;font-size:13px;color:var(--text2);margin-bottom:10px">Pay via UPI: <b onclick="copyUpi(\''+esc(ev.payment_value)+'\')" style="cursor:pointer;color:var(--accent)">'+esc(ev.payment_value)+' <i class="ti ti-copy" style="font-size:12px"></i></b></div>'
+  } else if (ev.payment_type === 'qr_url') {
+    footer += '<img class="qr-preview" src="'+esc(ev.payment_value)+'" alt="Payment QR"/>'
+  } else if (ev.payment_type === 'link') {
+    footer += '<a href="'+esc(ev.payment_value)+'" target="_blank" rel="noopener" style="display:block;text-align:center;font-size:13px;color:var(--green);font-weight:700;margin-bottom:10px"><i class="ti ti-link"></i> Pay Online</a>'
+  }
+  footer += '<button class="detail-pay-btn link" onclick="openRegister(\''+ev.id+'\')"><i class="ti ti-clipboard-list"></i>Register For This Event</button>'
   footer += '<button class="secondary-btn" style="margin-top:8px" onclick="copyEventLink(\''+ev.id+'\')"><i class="ti ti-share"></i>Copy Shareable Link</button>'
   if (isOwner) {
     footer += '<button class="secondary-btn" style="margin-top:8px" onclick="openRegistrants(\''+ev.id+'\')"><i class="ti ti-list-details"></i>View Registrations</button>'
