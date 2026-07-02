@@ -714,6 +714,9 @@ mixpanel.init('bd56a891f17bb6f6cd5be61a4399fd49', {track_pageview: true, persist
     <a href="events.html" class="auth-btn" style="text-decoration:none">
       <i class="ti ti-calendar-event"></i><span>Events</span>
     </a>
+    <button class="auth-btn" id="auth-btn" onclick="handleAuthBtn()">
+      <i class="ti ti-user-circle"></i><span id="auth-btn-label">Sign in</span>
+    </button>
     <button class="add-btn" onclick="openModal()">
       <i class="ti ti-plus"></i>Add Community
     </button>
@@ -928,6 +931,149 @@ mixpanel.init('bd56a891f17bb6f6cd5be61a4399fd49', {track_pageview: true, persist
   </div>
 </div>
 
+<!-- SIGN IN MODAL -->
+<div class="overlay" id="auth-overlay" onclick="closeAuthOutside(event)">
+  <div class="modal" style="max-width:400px">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title">Sign In</div>
+        <div class="modal-sub">We'll email you a magic link — no password needed</div>
+      </div>
+      <button class="modal-close" onclick="closeAuthModal()"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="field">
+      <label>Email</label>
+      <input type="email" id="auth-email" placeholder="you@example.com"/>
+    </div>
+    <div class="otp-sent" id="otp-sent">
+      <i class="ti ti-mail-check" style="font-size:20px;display:block;margin-bottom:6px"></i>
+      Check your inbox — click the link to sign in. You can close this window.
+    </div>
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closeAuthModal()">Cancel</button>
+      <button class="btn-submit" id="auth-send-btn" onclick="sendMagicLink()" style="background:var(--green)">
+        <i class="ti ti-send"></i>Send Magic Link
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- CLAIM COMMUNITY MODAL -->
+<div class="overlay" id="claim-overlay" onclick="closeClaimOutside(event)">
+  <div class="modal" style="max-width:460px">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title">Claim This Community</div>
+        <div class="modal-sub">We'll verify you're the admin before approving</div>
+      </div>
+      <button class="modal-close" onclick="closeClaimModal()"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="field">
+      <label>Your Name</label>
+      <input type="text" id="claim-name" placeholder="e.g. Srikeerthi" maxlength="80" autocomplete="off"/>
+    </div>
+    <div class="field">
+      <label>Phone Number</label>
+      <input type="text" id="claim-phone" placeholder="ideally the same number admining the group" maxlength="20" autocomplete="off"/>
+    </div>
+    <div class="field">
+      <label>Email</label>
+      <input type="email" id="claim-email" placeholder="you@example.com" autocomplete="off"/>
+    </div>
+    <div class="field">
+      <label>Proof of Ownership <span style="color:var(--text3);font-weight:400;font-size:10px">(optional)</span></label>
+      <input type="text" id="claim-proof" placeholder="screenshot link, or note showing you admin the group" maxlength="300" autocomplete="off"/>
+      <div class="field-hint">A Drive/Imgur link to a screenshot of your admin status speeds up approval.</div>
+    </div>
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closeClaimModal()">Cancel</button>
+      <button class="btn-submit" id="claim-submit-btn" onclick="submitClaim()" style="background:var(--green)">
+        <i class="ti ti-shield-check"></i>Submit Claim
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- EDIT COMMUNITY MODAL -->
+<div class="overlay" id="edit-overlay" onclick="closeEditOutside(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title">Edit Your Community</div>
+        <div class="modal-sub">Update the details shown on your card</div>
+      </div>
+      <button class="modal-close" onclick="closeEditModal()"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="field">
+      <label>WhatsApp / Instagram Link</label>
+      <input type="text" id="e-link" maxlength="300"/>
+    </div>
+    <div class="field">
+      <label>Community Name</label>
+      <input type="text" id="e-name" maxlength="100"/>
+    </div>
+    <div class="field">
+      <label>About This Community</label>
+      <textarea id="e-desc" rows="3" maxlength="500"></textarea>
+      <div class="field-hint" id="e-desc-count" style="text-align:right">0 / 500</div>
+    </div>
+    <div class="field">
+      <label>Community Type</label>
+      <div class="toggle-row">
+        <button type="button" class="toggle-opt" id="e-tog-online" onclick="setEditCommType('online')"><i class="ti ti-wifi"></i> Online</button>
+        <button type="button" class="toggle-opt" id="e-tog-offline" onclick="setEditCommType('offline')"><i class="ti ti-map-pin"></i> Offline</button>
+        <button type="button" class="toggle-opt" id="e-tog-both" onclick="setEditCommType('both')"><i class="ti ti-world"></i> Both</button>
+      </div>
+    </div>
+    <div class="field" id="e-city-field">
+      <label>City <span style="color:var(--text3);font-weight:400;font-size:10px">(skip if online only)</span></label>
+      <select id="e-city">
+        <option value="">select city…</option>
+        <option value="Bengaluru">Bengaluru</option>
+        <option value="Mumbai">Mumbai</option>
+        <option value="Delhi">Delhi</option>
+        <option value="Chennai">Chennai</option>
+        <option value="Hyderabad">Hyderabad</option>
+        <option value="Pune">Pune</option>
+        <option value="Kolkata">Kolkata</option>
+        <option value="Ahmedabad">Ahmedabad</option>
+        <option value="Jaipur">Jaipur</option>
+        <option value="Surat">Surat</option>
+        <option value="Lucknow">Lucknow</option>
+        <option value="Kochi">Kochi</option>
+        <option value="Indore">Indore</option>
+        <option value="Bhopal">Bhopal</option>
+        <option value="Chandigarh">Chandigarh</option>
+        <option value="Nagpur">Nagpur</option>
+        <option value="Visakhapatnam">Visakhapatnam</option>
+        <option value="Coimbatore">Coimbatore</option>
+        <option value="Thiruvananthapuram">Thiruvananthapuram</option>
+        <option value="Patna">Patna</option>
+        <option value="other">other city…</option>
+      </select>
+    </div>
+    <div class="field" id="e-city-other-field" style="display:none">
+      <label>City Name</label>
+      <input type="text" id="e-city-other" maxlength="60"/>
+    </div>
+    <div class="field">
+      <label>Category</label>
+      <select id="e-cat-select"><option value="">select a category…</option></select>
+    </div>
+    <div class="field">
+      <label>Additional Categories <span style="color:var(--text3);font-weight:400;font-size:10px">(optional)</span></label>
+      <select id="e-cat-select-secondary" style="margin-bottom:6px"><option value="">none</option></select>
+      <select id="e-cat-select-tertiary"><option value="">none</option></select>
+    </div>
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closeEditModal()">Cancel</button>
+      <button class="btn-submit" id="edit-submit-btn" onclick="submitEdit()" style="background:var(--green)">
+        <i class="ti ti-device-floppy"></i>Save Changes
+      </button>
+    </div>
+  </div>
+</div>
+
 <!-- REPORT MODAL -->
 <div class="overlay" id="report-overlay" onclick="closeReportOutside(event)">
   <div class="report-modal">
@@ -968,6 +1114,9 @@ const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFz
 // ──────────────────────────────────────────
 
 const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON)
+let session = null
+let currentDetailCommunity = null
+let selEditCommType = ''
 
 const PER_PAGE = 16
 let page = 1, cat = 'all', filter = 'all', q = '', selCatSlug = ''
@@ -1047,10 +1196,27 @@ const CAT_ICONS = {
 // ── INIT ──
 async function init() {
   showSkeletons()
+  const { data: { session: s } } = await db.auth.getSession()
+  session = s
+  updateAuthUi()
+  db.auth.onAuthStateChange((_evt, s2) => {
+    session = s2
+    updateAuthUi()
+    if (session) {
+      const pendingId = sessionStorage.getItem('cc_pending_claim')
+      if (pendingId) {
+        sessionStorage.removeItem('cc_pending_claim')
+        reportingCommunityId = pendingId
+        closeAuthModal()
+        setTimeout(() => openClaimModal(), 300)
+      }
+    }
+  })
   const { data } = await db.from('categories').select('*').order('sort_order')
   cats = data || []
   buildSidebar()
   buildCatPills()
+  buildEditCatSelects()
   await loadGrid()
 }
 
@@ -1323,6 +1489,7 @@ async function openDetail(id) {
     ${c.city ? '<div class="detail-meta-item"><i class="ti ti-map-pin"></i>' + esc(c.city) + '</div>' : ''}
     <div class="detail-meta-item"><i class="ti ti-tag"></i>${esc(ct.name||'')}</div>`
   reportingCommunityId = c.id
+  currentDetailCommunity = c
   renderClaimArea(c)
   const btn = document.getElementById('dm-join-btn')
   btn.href = safeJoinHref(c.whatsapp_link)
@@ -1347,14 +1514,227 @@ function closeDetailOutside(e) {
 function renderClaimArea(c) {
   const area = document.getElementById('dm-claim-area')
   if (c.claim_status === 'approved') {
-    area.innerHTML = '<div class="claimed-badge"><i class="ti ti-shield-check"></i>Claimed by community owner</div>'
+    if (session && c.claimed_by_user_id === session.user.id) {
+      area.innerHTML =
+        '<button class="claim-btn" onclick="openEditModal()"><i class="ti ti-edit"></i>Edit Community</button>' +
+        '<div class="claimed-badge" style="margin-top:8px"><i class="ti ti-shield-check"></i>Claimed by you</div>'
+    } else {
+      area.innerHTML = '<div class="claimed-badge"><i class="ti ti-shield-check"></i>Claimed by community owner</div>'
+    }
+  } else if (c.claim_status === 'pending') {
+    if (session && c.claimed_by_user_id === session.user.id) {
+      area.innerHTML = '<div class="claim-pending-badge"><i class="ti ti-clock"></i>Your claim is pending approval</div>'
+    } else {
+      area.innerHTML = '<div class="claim-pending-badge"><i class="ti ti-clock"></i>Claim pending review</div>'
+    }
+  } else {
+    area.innerHTML = '<button class="claim-btn" onclick="openClaimModal()"><i class="ti ti-shield-check"></i>Claim This Community</button>'
+  }
+}
+
+// ── AUTH ──
+function updateAuthUi() {
+  const btn = document.getElementById('auth-btn')
+  const label = document.getElementById('auth-btn-label')
+  if (!btn) return
+  if (session) {
+    btn.classList.add('signed-in')
+    label.textContent = session.user.email.split('@')[0]
+  } else {
+    btn.classList.remove('signed-in')
+    label.textContent = 'Sign in'
+  }
+}
+function handleAuthBtn() {
+  if (session) {
+    if (confirm('Sign out of ' + session.user.email + '?')) db.auth.signOut()
+  } else {
+    openAuthModal()
+  }
+}
+function openAuthModal() {
+  document.getElementById('otp-sent').classList.remove('show')
+  document.getElementById('auth-email').value = ''
+  document.getElementById('auth-overlay').classList.add('open')
+  document.body.style.overflow = 'hidden'
+}
+function closeAuthModal() {
+  document.getElementById('auth-overlay').classList.remove('open')
+  document.body.style.overflow = ''
+}
+function closeAuthOutside(e){ if (e.target === document.getElementById('auth-overlay')) closeAuthModal() }
+async function sendMagicLink() {
+  const email = document.getElementById('auth-email').value.trim()
+  if (!email || !email.includes('@')) { toast('Enter a valid email.', true); return }
+  const btn = document.getElementById('auth-send-btn')
+  btn.disabled = true
+  btn.innerHTML = '<i class="ti ti-loader-2" style="animation:spin 1s linear infinite"></i> sending…'
+  const { error } = await db.auth.signInWithOtp({ email, options: { emailRedirectTo: window.location.href } })
+  btn.disabled = false
+  btn.innerHTML = '<i class="ti ti-send"></i>Send Magic Link'
+  if (error) { toast(error.message || 'Could not send link — try again.', true); console.error('signInWithOtp error:', error.status, error.message); return }
+  document.getElementById('otp-sent').classList.add('show')
+}
+
+// ── CLAIM COMMUNITY ──
+function openClaimModal() {
+  if (!session) {
+    if (reportingCommunityId) sessionStorage.setItem('cc_pending_claim', reportingCommunityId)
+    toast('Please sign in first to claim a community.', true)
+    openAuthModal()
     return
   }
-  const subject = encodeURIComponent('Claim my community: ' + c.name)
-  const body = encodeURIComponent('Hi, I run "' + c.name + '" and would like to claim this listing.\n\nMy name:\nMy phone number:\nProof I admin this group (screenshot link, optional):\n')
-  area.innerHTML =
-    '<a class="claim-btn" style="text-decoration:none" href="mailto:closeconnect27@gmail.com?subject=' + subject + '&body=' + body + '">' +
-    '<i class="ti ti-mail"></i>Email Us To Claim This Community</a>'
+  document.getElementById('claim-name').value = ''
+  document.getElementById('claim-phone').value = ''
+  document.getElementById('claim-email').value = session.user.email || ''
+  document.getElementById('claim-proof').value = ''
+  document.getElementById('claim-overlay').classList.add('open')
+  document.body.style.overflow = 'hidden'
+}
+function closeClaimModal() {
+  document.getElementById('claim-overlay').classList.remove('open')
+  document.body.style.overflow = ''
+}
+function closeClaimOutside(e){ if (e.target === document.getElementById('claim-overlay')) closeClaimModal() }
+async function submitClaim() {
+  if (!session) { toast('Please sign in first.', true); return }
+  if (!reportingCommunityId) return
+  const name = sanitise(document.getElementById('claim-name').value.trim(), 80)
+  const phone = sanitise(document.getElementById('claim-phone').value.trim(), 20)
+  const email = sanitise(document.getElementById('claim-email').value.trim(), 100)
+  const proof = sanitise(document.getElementById('claim-proof').value.trim(), 300)
+  if (!name || !phone || !email) { toast('Please fill in name, phone and email.', true); return }
+
+  const btn = document.getElementById('claim-submit-btn')
+  btn.disabled = true
+  btn.innerHTML = '<i class="ti ti-loader-2" style="animation:spin 1s linear infinite"></i> submitting…'
+  const { error } = await db.from('claims').insert({
+    community_id: reportingCommunityId,
+    claimant_user_id: session.user.id,
+    name, phone, email,
+    proof: proof || null,
+    status: 'pending'
+  })
+  btn.disabled = false
+  btn.innerHTML = '<i class="ti ti-shield-check"></i>Submit Claim'
+  if (error) { toast('Could not submit claim — try again.', true); console.error(error); return }
+
+  await db.rpc('submit_claim', { p_community_id: reportingCommunityId })
+  closeClaimModal()
+  toast('Claim submitted — we\'ll review it shortly.')
+  openDetail(reportingCommunityId)
+}
+
+// ── EDIT COMMUNITY ──
+function buildEditCatSelects() {
+  ;['e-cat-select','e-cat-select-secondary','e-cat-select-tertiary'].forEach(function(id, idx) {
+    var s = document.getElementById(id)
+    if (!s) return
+    s.innerHTML = idx === 0 ? '<option value="">select a category…</option>' : '<option value="">none</option>'
+    cats.forEach(function(c) {
+      var o = document.createElement('option')
+      o.value = c.slug
+      o.textContent = (c.emoji||'') + ' ' + c.name
+      s.appendChild(o)
+    })
+  })
+}
+function openEditModal() {
+  const c = currentDetailCommunity
+  if (!c || !session || c.claimed_by_user_id !== session.user.id) { toast('You can only edit a community you own.', true); return }
+  document.getElementById('e-link').value = c.whatsapp_link || ''
+  document.getElementById('e-name').value = c.name || ''
+  document.getElementById('e-desc').value = c.description || ''
+  document.getElementById('e-desc-count').textContent = (c.description||'').length + ' / 500'
+  setEditCommType(c.community_type || 'both')
+  const citySelect = document.getElementById('e-city')
+  const cityOtherField = document.getElementById('e-city-other-field')
+  const knownCity = Array.from(citySelect.options).some(o => o.value === c.city)
+  if (c.city && !knownCity) {
+    citySelect.value = 'other'
+    cityOtherField.style.display = ''
+    document.getElementById('e-city-other').value = c.city
+  } else {
+    citySelect.value = c.city || ''
+    cityOtherField.style.display = 'none'
+  }
+  const ct = c.categories || {}
+  document.getElementById('e-cat-select').value = ct.slug || ''
+  const extras = c.extra_categories || []
+  document.getElementById('e-cat-select-secondary').value = extras[0] || ''
+  document.getElementById('e-cat-select-tertiary').value = extras[1] || ''
+  closeDetail()
+  document.getElementById('edit-overlay').classList.add('open')
+  document.body.style.overflow = 'hidden'
+}
+function closeEditModal() {
+  document.getElementById('edit-overlay').classList.remove('open')
+  document.body.style.overflow = ''
+}
+function closeEditOutside(e){ if (e.target === document.getElementById('edit-overlay')) closeEditModal() }
+function setEditCommType(type) {
+  selEditCommType = type
+  document.querySelectorAll('#edit-overlay .toggle-opt').forEach(b => b.classList.remove('sel-online','sel-offline','sel-both'))
+  document.getElementById('e-tog-' + type).classList.add('sel-' + type)
+  const cityField = document.getElementById('e-city-field')
+  if (type === 'online') { cityField.style.opacity = '.4'; cityField.style.pointerEvents = 'none' }
+  else { cityField.style.opacity = '1'; cityField.style.pointerEvents = '' }
+}
+document.addEventListener('DOMContentLoaded', () => {
+  const eDesc = document.getElementById('e-desc')
+  if (eDesc) eDesc.addEventListener('input', function() {
+    document.getElementById('e-desc-count').textContent = this.value.length + ' / 500'
+  })
+  const eCity = document.getElementById('e-city')
+  if (eCity) eCity.addEventListener('change', function() {
+    document.getElementById('e-city-other-field').style.display = this.value === 'other' ? '' : 'none'
+  })
+})
+async function submitEdit() {
+  const c = currentDetailCommunity
+  if (!c || !session || c.claimed_by_user_id !== session.user.id) { toast('You can only edit a community you own.', true); return }
+
+  const rawLink = document.getElementById('e-link').value.trim()
+  const rawName = document.getElementById('e-name').value.trim()
+  const rawDesc = document.getElementById('e-desc').value.trim()
+  const catSlug = document.getElementById('e-cat-select').value
+
+  if (!rawLink || !rawName || !rawDesc || !catSlug) { toast('Please fill in all fields and pick a category.', true); return }
+  if (!isValidWaLink(rawLink)) { toast('Please enter a valid WhatsApp or Instagram link.', true); return }
+  if (rawName.length < 3) { toast('Community name must be at least 3 characters.', true); return }
+  if (rawDesc.length < 10) { toast('Please write at least 10 characters about this community.', true); return }
+
+  const name = sanitise(rawName, 100)
+  const desc = sanitise(rawDesc, 500)
+  const catMatch = cats.find(x => x.slug === catSlug)
+  const sec = document.getElementById('e-cat-select-secondary').value
+  const ter = document.getElementById('e-cat-select-tertiary').value
+  const extraCats = [sec, ter].filter(Boolean).filter(s => s !== catSlug)
+  const rawCity = document.getElementById('e-city').value
+  const cityOtherVal = document.getElementById('e-city-other').value.trim()
+  const finalCity = rawCity === 'other' ? sanitise(cityOtherVal, 60) : rawCity
+
+  const btn = document.getElementById('edit-submit-btn')
+  btn.disabled = true
+  btn.innerHTML = '<i class="ti ti-loader-2" style="animation:spin 1s linear infinite"></i> saving…'
+
+  const { error } = await db.from('communities').update({
+    name, description: desc, whatsapp_link: rawLink,
+    community_type: selEditCommType || 'both',
+    city: finalCity || null,
+    category_id: catMatch ? catMatch.id : c.category_id,
+    extra_categories: extraCats.length ? extraCats : null
+  }).eq('id', c.id).eq('claimed_by_user_id', session.user.id)
+
+  btn.disabled = false
+  btn.innerHTML = '<i class="ti ti-device-floppy"></i>Save Changes'
+
+  if (error) { toast('Could not save changes — try again.', true); console.error(error); return }
+
+  toast('✅ Community updated!')
+  closeEditModal()
+  page = 1; loadGrid()
+  openDetail(c.id)
 }
 
 // ── SUBMIT MODAL ──
