@@ -714,9 +714,6 @@ mixpanel.init('bd56a891f17bb6f6cd5be61a4399fd49', {track_pageview: true, persist
     <a href="events.html" class="auth-btn" style="text-decoration:none">
       <i class="ti ti-calendar-event"></i><span>Events</span>
     </a>
-    <button class="auth-btn" id="auth-btn" onclick="handleAuthBtn()">
-      <i class="ti ti-user-circle"></i><span id="auth-btn-label">Sign in</span>
-    </button>
     <button class="add-btn" onclick="openModal()">
       <i class="ti ti-plus"></i>Add Community
     </button>
@@ -951,69 +948,6 @@ mixpanel.init('bd56a891f17bb6f6cd5be61a4399fd49', {track_pageview: true, persist
   </div>
 </div>
 
-<!-- SIGN IN MODAL -->
-<div class="overlay" id="auth-overlay" onclick="closeAuthOutside(event)">
-  <div class="modal" style="max-width:400px">
-    <div class="modal-header">
-      <div>
-        <div class="modal-title">Sign In</div>
-        <div class="modal-sub">We'll email you a magic link — no password needed</div>
-      </div>
-      <button class="modal-close" onclick="closeAuthModal()"><i class="ti ti-x"></i></button>
-    </div>
-    <div class="field">
-      <label>Email</label>
-      <input type="email" id="auth-email" placeholder="you@example.com"/>
-    </div>
-    <div class="otp-sent" id="otp-sent">
-      <i class="ti ti-mail-check" style="font-size:20px;display:block;margin-bottom:6px"></i>
-      Check your inbox — click the link to sign in. You can close this window.
-    </div>
-    <div class="modal-btns">
-      <button class="btn-cancel" onclick="closeAuthModal()">Cancel</button>
-      <button class="btn-submit" id="auth-send-btn" onclick="sendMagicLink()" style="background:var(--green)">
-        <i class="ti ti-send"></i>Send Magic Link
-      </button>
-    </div>
-  </div>
-</div>
-
-<!-- CLAIM COMMUNITY MODAL -->
-<div class="overlay" id="claim-overlay" onclick="closeClaimOutside(event)">
-  <div class="modal" style="max-width:460px">
-    <div class="modal-header">
-      <div>
-        <div class="modal-title">Claim This Community</div>
-        <div class="modal-sub">We'll verify you're the admin before approving</div>
-      </div>
-      <button class="modal-close" onclick="closeClaimModal()"><i class="ti ti-x"></i></button>
-    </div>
-    <div class="field">
-      <label>Your Name</label>
-      <input type="text" id="claim-name" placeholder="e.g. Srikeerthi" maxlength="80"/>
-    </div>
-    <div class="field">
-      <label>Phone Number</label>
-      <input type="text" id="claim-phone" placeholder="ideally the same number admining the group" maxlength="20"/>
-    </div>
-    <div class="field">
-      <label>Email</label>
-      <input type="email" id="claim-email" placeholder="you@example.com"/>
-    </div>
-    <div class="field">
-      <label>Proof of Ownership <span style="color:var(--text3);font-weight:400;font-size:10px">(optional)</span></label>
-      <input type="text" id="claim-proof" placeholder="screenshot link, or note showing you admin the group" maxlength="300"/>
-      <div class="field-hint">A Drive/Imgur link to a screenshot of your admin status speeds up approval.</div>
-    </div>
-    <div class="modal-btns">
-      <button class="btn-cancel" onclick="closeClaimModal()">Cancel</button>
-      <button class="btn-submit" id="claim-submit-btn" onclick="submitClaim()" style="background:var(--green)">
-        <i class="ti ti-shield-check"></i>Submit Claim
-      </button>
-    </div>
-  </div>
-</div>
-
 <!-- FOOTER -->
 <footer style="border-top:1px solid var(--border);padding:24px 32px;max-width:1600px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
   <span style="font-family:'Syne',sans-serif;font-weight:800;font-size:16px;color:var(--text)">Close<span style="color:var(--green)">.</span>Connect</span>
@@ -1034,8 +968,6 @@ const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFz
 // ──────────────────────────────────────────
 
 const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON)
-let session = null
-let reportingCommunityClaimStatus = 'unclaimed'
 
 const PER_PAGE = 16
 let page = 1, cat = 'all', filter = 'all', q = '', selCatSlug = ''
@@ -1115,10 +1047,6 @@ const CAT_ICONS = {
 // ── INIT ──
 async function init() {
   showSkeletons()
-  const { data: { session: s } } = await db.auth.getSession()
-  session = s
-  updateAuthUi()
-  db.auth.onAuthStateChange((_evt, s2) => { session = s2; updateAuthUi() })
   const { data } = await db.from('categories').select('*').order('sort_order')
   cats = data || []
   buildSidebar()
@@ -1257,8 +1185,10 @@ function buildCard(c) {
   parts.push('<div class="card-desc">' + linkify(c.description||'') + '</div>')
   parts.push('<div class="card-footer">')
   parts.push('<div class="card-meta-row">' + typeBadge + cityHtml + '</div>')
-  parts.push('<a href="' + safeJoinHref(c.whatsapp_link) + '" target="_blank" rel="noopener noreferrer" class="wa-btn" onclick="trackClick(event,\'' + id + '\')">')
-  parts.push('<i class="ti ti-brand-whatsapp"></i>Join</a>')
+  var isInstaLink = c.whatsapp_link && c.whatsapp_link.includes('instagram.com')
+  parts.push('<a href="' + safeJoinHref(c.whatsapp_link) + '" target="_blank" rel="noopener noreferrer" class="wa-btn"' + (isInstaLink ? ' style="background:linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888)"' : '') + ' onclick="trackClick(event,\'' + id + '\')">')
+  parts.push(isInstaLink ? '<i class="ti ti-brand-instagram"></i>View' : '<i class="ti ti-brand-whatsapp"></i>Join')
+  parts.push('</a>')
   parts.push('</div></div></div>')
   return parts.join('')
 }
@@ -1393,7 +1323,6 @@ async function openDetail(id) {
     ${c.city ? '<div class="detail-meta-item"><i class="ti ti-map-pin"></i>' + esc(c.city) + '</div>' : ''}
     <div class="detail-meta-item"><i class="ti ti-tag"></i>${esc(ct.name||'')}</div>`
   reportingCommunityId = c.id
-  reportingCommunityClaimStatus = c.claim_status || 'unclaimed'
   renderClaimArea(c)
   const btn = document.getElementById('dm-join-btn')
   btn.href = safeJoinHref(c.whatsapp_link)
@@ -1414,113 +1343,18 @@ function closeDetailOutside(e) {
   if (e.target === document.getElementById('detail-overlay')) closeDetail()
 }
 
-// ── CLAIM AREA (inside detail modal) ──
+// ── CLAIM AREA — manual, no login required ──
 function renderClaimArea(c) {
   const area = document.getElementById('dm-claim-area')
   if (c.claim_status === 'approved') {
     area.innerHTML = '<div class="claimed-badge"><i class="ti ti-shield-check"></i>Claimed by community owner</div>'
-  } else if (c.claim_status === 'pending') {
-    if (session && c.claimed_by_user_id === session.user.id) {
-      area.innerHTML = '<div class="claim-pending-badge"><i class="ti ti-clock"></i>Your claim is pending approval</div>'
-    } else {
-      area.innerHTML = '<div class="claim-pending-badge"><i class="ti ti-clock"></i>Claim pending review</div>'
-    }
-  } else {
-    area.innerHTML = '<button class="claim-btn" onclick="openClaimModal()"><i class="ti ti-shield-check"></i>Claim This Community</button>'
-  }
-}
-
-// ── AUTH ──
-function updateAuthUi() {
-  const btn = document.getElementById('auth-btn')
-  const label = document.getElementById('auth-btn-label')
-  if (!btn) return
-  if (session) {
-    btn.classList.add('signed-in')
-    label.textContent = session.user.email.split('@')[0]
-  } else {
-    btn.classList.remove('signed-in')
-    label.textContent = 'Sign in'
-  }
-}
-function handleAuthBtn() {
-  if (session) {
-    if (confirm('Sign out of ' + session.user.email + '?')) db.auth.signOut()
-  } else {
-    openAuthModal()
-  }
-}
-function openAuthModal() {
-  document.getElementById('otp-sent').classList.remove('show')
-  document.getElementById('auth-email').value = ''
-  document.getElementById('auth-overlay').classList.add('open')
-  document.body.style.overflow = 'hidden'
-}
-function closeAuthModal() {
-  document.getElementById('auth-overlay').classList.remove('open')
-  document.body.style.overflow = ''
-}
-function closeAuthOutside(e){ if (e.target === document.getElementById('auth-overlay')) closeAuthModal() }
-async function sendMagicLink() {
-  const email = document.getElementById('auth-email').value.trim()
-  if (!email || !email.includes('@')) { toast('Enter a valid email.', true); return }
-  const btn = document.getElementById('auth-send-btn')
-  btn.disabled = true
-  btn.innerHTML = '<i class="ti ti-loader-2" style="animation:spin 1s linear infinite"></i> sending…'
-  const { error } = await db.auth.signInWithOtp({ email, options: { emailRedirectTo: window.location.href } })
-  btn.disabled = false
-  btn.innerHTML = '<i class="ti ti-send"></i>Send Magic Link'
-  if (error) { toast('Could not send link — try again.', true); return }
-  document.getElementById('otp-sent').classList.add('show')
-}
-
-// ── CLAIM COMMUNITY ──
-function openClaimModal() {
-  if (!session) {
-    toast('Please sign in first to claim a community.', true)
-    openAuthModal()
     return
   }
-  document.getElementById('claim-name').value = ''
-  document.getElementById('claim-phone').value = ''
-  document.getElementById('claim-email').value = session.user.email || ''
-  document.getElementById('claim-proof').value = ''
-  document.getElementById('claim-overlay').classList.add('open')
-  document.body.style.overflow = 'hidden'
-}
-function closeClaimModal() {
-  document.getElementById('claim-overlay').classList.remove('open')
-  document.body.style.overflow = ''
-}
-function closeClaimOutside(e){ if (e.target === document.getElementById('claim-overlay')) closeClaimModal() }
-async function submitClaim() {
-  if (!session) { toast('Please sign in first.', true); return }
-  if (!reportingCommunityId) return
-  const name = sanitise(document.getElementById('claim-name').value.trim(), 80)
-  const phone = sanitise(document.getElementById('claim-phone').value.trim(), 20)
-  const email = sanitise(document.getElementById('claim-email').value.trim(), 100)
-  const proof = sanitise(document.getElementById('claim-proof').value.trim(), 300)
-  if (!name || !phone || !email) { toast('Please fill in name, phone and email.', true); return }
-
-  const btn = document.getElementById('claim-submit-btn')
-  btn.disabled = true
-  btn.innerHTML = '<i class="ti ti-loader-2" style="animation:spin 1s linear infinite"></i> submitting…'
-  const { error } = await db.from('claims').insert({
-    community_id: reportingCommunityId,
-    claimant_user_id: session.user.id,
-    name, phone, email,
-    proof: proof || null,
-    status: 'pending'
-  })
-  btn.disabled = false
-  btn.innerHTML = '<i class="ti ti-shield-check"></i>Submit Claim'
-  if (error) { toast('Could not submit claim — try again.', true); console.error(error); return }
-
-  // mark this community pending via a scoped RPC (bypasses the need for a broad UPDATE policy)
-  await db.rpc('submit_claim', { p_community_id: reportingCommunityId })
-  closeClaimModal()
-  toast('Claim submitted — we\'ll review it shortly.')
-  openDetail(reportingCommunityId)
+  const subject = encodeURIComponent('Claim my community: ' + c.name)
+  const body = encodeURIComponent('Hi, I run "' + c.name + '" and would like to claim this listing.\n\nMy name:\nMy phone number:\nProof I admin this group (screenshot link, optional):\n')
+  area.innerHTML =
+    '<a class="claim-btn" style="text-decoration:none" href="mailto:closeconnect27@gmail.com?subject=' + subject + '&body=' + body + '">' +
+    '<i class="ti ti-mail"></i>Email Us To Claim This Community</a>'
 }
 
 // ── SUBMIT MODAL ──
