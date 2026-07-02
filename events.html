@@ -49,7 +49,7 @@ button{cursor:pointer;font-family:inherit}
   display:flex;align-items:center;gap:16px;
   box-shadow:0 1px 0 var(--border);
 }
-.logo{font-family:'Syne',sans-serif;font-weight:800;font-size:20px;letter-spacing:-.5px;white-space:nowrap;flex-shrink:0;color:var(--text);display:flex;align-items:center;gap:10px}
+.logo{font-family:'Syne',sans-serif;font-weight:800;font-size:20px;letter-spacing:-.5px;white-space:nowrap;flex-shrink:0;color:var(--text)}
 .logo span{color:var(--green)}
 .back-link{
   display:flex;align-items:center;gap:5px;font-size:13px;font-weight:600;
@@ -241,23 +241,23 @@ button{cursor:pointer;font-family:inherit}
 /* ── DATE RANGE POPOVER ── */
 .dr-popover{
   position:absolute;top:calc(100% + 8px);left:0;background:var(--surface);border:1px solid var(--border);
-  border-radius:16px;box-shadow:0 16px 48px rgba(0,0,0,.18);z-index:300;display:none;overflow:hidden;
-  width:min(640px,92vw);
+  border-radius:14px;box-shadow:0 16px 48px rgba(0,0,0,.18);z-index:300;display:none;overflow:hidden;
+  width:min(460px,92vw);
 }
 .dr-popover.open{display:block}
-.dr-summary{background:var(--green-light);color:var(--green);padding:14px 20px;font-size:13px;font-weight:700;display:flex;align-items:center;gap:8px}
-.dr-body{display:flex;gap:0;padding:18px 20px 8px;flex-wrap:wrap}
-.dr-month{flex:1;min-width:230px}
-.dr-month-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;padding:0 2px}
-.dr-month-head span{font-size:13px;font-weight:700;color:var(--text)}
-.dr-nav{width:24px;height:24px;border-radius:50%;border:none;background:transparent;color:var(--text3);display:flex;align-items:center;justify-content:center;transition:all .12s}
+.dr-summary{background:var(--green-light);color:var(--green);padding:10px 16px;font-size:12px;font-weight:700;display:flex;align-items:center;gap:7px}
+.dr-body{display:flex;gap:14px;padding:14px 16px 4px;flex-wrap:wrap}
+.dr-month{flex:1;min-width:170px}
+.dr-month-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;padding:0 2px}
+.dr-month-head span{font-size:11.5px;font-weight:700;color:var(--text)}
+.dr-nav{width:20px;height:20px;border-radius:50%;border:none;background:transparent;color:var(--text3);display:flex;align-items:center;justify-content:center;transition:all .12s}
 .dr-nav:hover{background:var(--surface2);color:var(--text)}
-.dr-weekdays{display:grid;grid-template-columns:repeat(7,1fr);margin-bottom:4px}
-.dr-weekdays span{font-size:10px;font-weight:700;color:var(--text3);text-align:center;padding:4px 0}
+.dr-weekdays{display:grid;grid-template-columns:repeat(7,1fr);margin-bottom:2px}
+.dr-weekdays span{font-size:9px;font-weight:700;color:var(--text3);text-align:center;padding:2px 0}
 .dr-days{display:grid;grid-template-columns:repeat(7,1fr);gap:1px}
 .dr-day{
-  aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--text);
-  cursor:pointer;border-radius:8px;transition:all .1s;position:relative;
+  aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:10.5px;color:var(--text);
+  cursor:pointer;border-radius:6px;transition:all .1s;position:relative;
 }
 .dr-day:hover:not(.dr-disabled){background:var(--surface2)}
 .dr-day.dr-muted{color:var(--border2);cursor:default}
@@ -267,12 +267,12 @@ button{cursor:pointer;font-family:inherit}
 .dr-day.dr-end{background:var(--green);color:#fff;font-weight:700;border-radius:0 8px 8px 0}
 .dr-day.dr-start.dr-end{border-radius:8px}
 .dr-day.dr-today:not(.dr-start):not(.dr-end)::after{content:'';position:absolute;bottom:3px;width:4px;height:4px;border-radius:50%;background:var(--green)}
-.dr-presets{display:flex;gap:8px;flex-wrap:wrap;padding:14px 20px;border-top:1px solid var(--border)}
-.dr-preset{padding:6px 14px;border-radius:999px;border:1.5px solid var(--border2);background:var(--surface);color:var(--text2);font-size:12px;font-weight:600;transition:all .12s}
+.dr-presets{display:flex;gap:6px;flex-wrap:wrap;padding:10px 16px;border-top:1px solid var(--border)}
+.dr-preset{padding:5px 11px;border-radius:999px;border:1.5px solid var(--border2);background:var(--surface);color:var(--text2);font-size:11px;font-weight:600;transition:all .12s}
 .dr-preset:hover{border-color:var(--green);color:var(--green);background:var(--green-light)}
-.dr-actions{display:flex;gap:10px;padding:0 20px 18px;justify-content:flex-end}
-.dr-apply{padding:9px 20px;border-radius:999px;border:none;background:var(--green);color:#fff;font-size:13px;font-weight:700}
-.dr-clear{padding:9px 16px;border-radius:999px;border:1.5px solid var(--border2);background:transparent;color:var(--text2);font-size:13px;font-weight:600}
+.dr-actions{display:flex;gap:8px;padding:0 16px 14px;justify-content:flex-end}
+.dr-apply{padding:7px 16px;border-radius:999px;border:none;background:var(--green);color:#fff;font-size:12px;font-weight:700}
+.dr-clear{padding:7px 13px;border-radius:999px;border:1.5px solid var(--border2);background:transparent;color:var(--text2);font-size:12px;font-weight:600}
 
 /* ── TOAST ── */
 .toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(20px);background:#1a1814;color:#fff;padding:11px 22px;border-radius:999px;font-size:13px;font-weight:500;display:flex;align-items:center;gap:8px;opacity:0;pointer-events:none;transition:all .3s ease;z-index:999;white-space:nowrap;box-shadow:0 4px 20px rgba(0,0,0,.2)}
@@ -491,7 +491,7 @@ const SUPABASE_URL  = 'https://vcfrezqaagrmgxrtmvwg.supabase.co'
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZjZnJlenFhYWdybWd4cnRtdndnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEwNTgzNzgsImV4cCI6MjA5NjYzNDM3OH0.CL-i8tus0pjAKnPNZSm5D1V7Q3va6mwIFOfPQwC3EdY'
 // Same UUID you inserted into app_settings ('admin_uid'). Used client-side only to decide
 // which communities to list in the Add Event form — actual permission is enforced by RLS.
-const ADMIN_UID = 'c2b706a9-93ff-4f5e-ade5-c937e6790e6c'
+const ADMIN_UID = 'PASTE-YOUR-ADMIN-UUID-HERE'
 // ──────────────────────────────────────────
 
 const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON)
