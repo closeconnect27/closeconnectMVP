@@ -290,7 +290,7 @@ button{cursor:pointer;font-family:inherit}
 .dr-nav:hover{background:var(--surface2);color:var(--text)}
 .dr-weekdays{display:grid;grid-template-columns:repeat(7,1fr);margin-bottom:2px}
 .dr-weekdays span{font-size:9px;font-weight:700;color:var(--text3);text-align:center;padding:2px 0}
-.dr-days{display:grid;grid-template-columns:repeat(7,1fr);gap:1px}
+.dr-days{display:grid;grid-template-columns:repeat(7,1fr);gap:1px;user-select:none}
 .dr-day{
   aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:10.5px;color:var(--text);
   cursor:pointer;border-radius:6px;transition:all .1s;position:relative;
@@ -1257,25 +1257,42 @@ function monthHtml(monthDate, side) {
   let cells = ''
   for (let i=0;i<startPad;i++) cells += '<div class="dr-day dr-muted"></div>'
   const todayIso = isoDate(new Date())
+  const rangeLo = (drStart && drEnd) ? (drStart < drEnd ? drStart : drEnd) : drStart
+  const rangeHi = (drStart && drEnd) ? (drStart < drEnd ? drEnd : drStart) : null
   for (let d=1; d<=daysInMonth; d++) {
     const cellDate = new Date(y,m,d)
     const iso = isoDate(cellDate)
     let cls = 'dr-day'
     if (iso === todayIso) cls += ' dr-today'
-    if (drStart && iso === drStart) cls += ' dr-start'
-    if (drEnd && iso === drEnd) cls += ' dr-end'
-    if (drStart && drEnd && iso > drStart && iso < drEnd) cls += ' dr-in-range'
-    cells += '<div class="'+cls+'" onclick="drPick(\''+iso+'\')">'+d+'</div>'
+    if (rangeLo && iso === rangeLo) cls += ' dr-start'
+    if (rangeHi && iso === rangeHi) cls += ' dr-end'
+    if (rangeLo && rangeHi && iso > rangeLo && iso < rangeHi) cls += ' dr-in-range'
+    cells += '<div class="'+cls+'" onmousedown="drMouseDown(\''+iso+'\')" onmouseenter="drMouseEnter(\''+iso+'\')">'+d+'</div>'
   }
   return '<div class="dr-month">'+nav+wd+'<div class="dr-days">'+cells+'</div></div>'
 }
 function drNav(dir) { drViewMonth.setMonth(drViewMonth.getMonth()+dir); renderDrPopover() }
-function drPick(iso) {
-  if (!drStart || (drStart && drEnd)) { drStart = iso; drEnd = null; renderDrPopover(); return }
-  if (iso < drStart) { drStart = iso; renderDrPopover(); return }
+
+let isDragging = false
+function drMouseDown(iso) {
+  isDragging = true
+  drStart = iso
+  drEnd = null
+  renderDrPopover()
+}
+function drMouseEnter(iso) {
+  if (!isDragging || !drStart) return
   drEnd = iso
+  renderDrPopover()
+}
+function drMouseUpGlobal() {
+  if (!isDragging) return
+  isDragging = false
+  if (!drEnd) drEnd = drStart
+  if (drEnd < drStart) { const tmp = drStart; drStart = drEnd; drEnd = tmp }
   drApply()
 }
+document.addEventListener('mouseup', drMouseUpGlobal)
 function drClear() { drStart = null; drEnd = null; drApply() }
 function applyPreset(kind) {
   const today = new Date()
