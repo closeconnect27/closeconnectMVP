@@ -1,0 +1,1059 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Events — Close.Connect</title>
+<meta name="description" content="Find events hosted by Bengaluru's WhatsApp communities — meetups, workshops, socials and more."/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css"/>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{
+  --bg:#fafaf8;
+  --surface:#ffffff;
+  --surface2:#f4f3f0;
+  --border:#e8e5e0;
+  --border2:#d8d4ce;
+  --text:#1a1814;
+  --text2:#6b6560;
+  --text3:#a09890;
+  --green:#1a7a5e;
+  --green-light:#edf7f3;
+  --green-mid:#159068;
+  --pink:#c2185b;
+  --pink-light:#fce4ec;
+  --wa:#25D366;
+  --accent:#7c3aed;
+  --accent-light:#f3f0ff;
+  --orange:#c2500a;
+  --orange-light:#fff3ec;
+  --radius:14px;
+  --radius-sm:8px;
+  --shadow:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
+  --shadow-md:0 4px 12px rgba(0,0,0,.08),0 2px 4px rgba(0,0,0,.04);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;font-size:15px;line-height:1.5}
+a{text-decoration:none;color:inherit}
+button{cursor:pointer;font-family:inherit}
+
+/* ── HEADER ── */
+.header{
+  position:sticky;top:0;z-index:200;
+  background:rgba(255,255,255,.95);
+  backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--border);
+  padding:0 32px;height:64px;
+  display:flex;align-items:center;gap:16px;
+  box-shadow:0 1px 0 var(--border);
+}
+.logo{font-family:'Syne',sans-serif;font-weight:800;font-size:20px;letter-spacing:-.5px;white-space:nowrap;flex-shrink:0;color:var(--text);display:flex;align-items:center;gap:10px}
+.logo span{color:var(--green)}
+.back-link{
+  display:flex;align-items:center;gap:5px;font-size:13px;font-weight:600;
+  color:var(--text2);padding:6px 12px;border-radius:999px;border:1.5px solid var(--border);
+  transition:all .12s;flex-shrink:0;
+}
+.back-link:hover{border-color:var(--text3);color:var(--text);background:var(--surface2)}
+.header-right{margin-left:auto;display:flex;gap:10px;align-items:center}
+.add-btn{
+  display:flex;align-items:center;gap:7px;padding:0 20px;height:42px;
+  background:var(--green);border:none;border-radius:999px;color:#fff;
+  font-size:14px;font-weight:600;transition:background .15s,box-shadow .15s;
+  white-space:nowrap;box-shadow:0 2px 8px rgba(26,122,94,.25);
+}
+.add-btn:hover{background:var(--green-mid);box-shadow:0 4px 14px rgba(26,122,94,.3)}
+.add-btn i{font-size:16px}
+.auth-btn{
+  display:flex;align-items:center;gap:7px;padding:0 16px;height:42px;
+  background:var(--surface);border:1.5px solid var(--border2);border-radius:999px;
+  color:var(--text2);font-size:13px;font-weight:600;transition:all .15s;white-space:nowrap;
+}
+.auth-btn:hover{border-color:var(--text3);color:var(--text)}
+.auth-btn.signed-in{background:var(--green-light);border-color:var(--green);color:var(--green)}
+
+/* ── HERO ── */
+.hero{padding:56px 32px 0;max-width:1600px;margin:0 auto}
+.hero h1{font-family:'Syne',sans-serif;font-size:clamp(32px,4vw,52px);font-weight:800;letter-spacing:-1.5px;line-height:1.05;margin-bottom:12px;color:var(--text)}
+.hero h1 em{font-style:normal;color:var(--green)}
+.hero p{font-size:16px;color:var(--text2);max-width:520px;margin-bottom:32px;line-height:1.7}
+
+/* ── FILTER BAR ── */
+.filters-wrap{max-width:1600px;margin:0 auto;padding:0 32px}
+.filter-group{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px;align-items:center}
+.filter-select{
+  height:38px;padding:0 14px;border:1.5px solid var(--border2);border-radius:999px;
+  background:var(--surface);color:var(--text2);font-size:13px;font-weight:500;
+  font-family:inherit;outline:none;cursor:pointer;appearance:none;min-width:130px;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23a09890' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 12px center;padding-right:30px;
+  transition:all .12s;
+}
+.filter-select:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(26,122,94,.08);color:var(--text)}
+.filter-select.active{background-color:var(--green);border-color:var(--green);color:#fff;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23ffffff' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E")}
+.daterange-btn{
+  height:38px;padding:0 16px;border:1.5px solid var(--border2);border-radius:999px;
+  background:var(--surface);color:var(--text2);font-size:13px;font-weight:500;
+  display:flex;align-items:center;gap:7px;transition:all .12s;
+}
+.daterange-btn:hover{border-color:var(--text3);color:var(--text)}
+.daterange-btn.active{background:var(--green);border-color:var(--green);color:#fff}
+.daterange-btn i{font-size:15px}
+.clear-filters{
+  font-size:12px;color:var(--text3);font-weight:600;padding:6px 10px;border-radius:999px;
+  transition:all .12s;display:flex;align-items:center;gap:4px;
+}
+.clear-filters:hover{color:var(--pink);background:var(--pink-light)}
+
+/* ── GRID ── */
+.main-wrap{max-width:1600px;margin:0 auto;padding:0 32px 80px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:18px;margin-bottom:28px}
+
+/* ── EVENT CARD ── */
+.ecard{
+  background:var(--surface);border:1px solid var(--border);border-radius:16px;
+  display:flex;flex-direction:column;transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease;
+  position:relative;overflow:hidden;cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.06);min-width:0;
+}
+.ecard:hover{transform:translateY(-4px);box-shadow:0 12px 32px rgba(0,0,0,.1);border-color:var(--border2)}
+.ecard-banner{height:100px;width:100%;position:relative;flex-shrink:0;overflow:hidden}
+.ecard-date-badge{
+  position:absolute;top:10px;left:10px;background:rgba(255,255,255,.95);border-radius:10px;
+  padding:5px 9px;text-align:center;line-height:1.1;z-index:1;box-shadow:0 2px 6px rgba(0,0,0,.15);
+}
+.ecard-date-badge .d-mon{font-size:9px;font-weight:700;color:var(--pink);text-transform:uppercase;letter-spacing:.4px}
+.ecard-date-badge .d-day{font-size:16px;font-weight:800;color:var(--text);font-family:'Syne',sans-serif;line-height:1.1}
+.ecard-cat-badge{
+  position:absolute;top:10px;right:10px;font-size:9px;font-weight:700;padding:3px 9px;border-radius:999px;
+  background:rgba(255,255,255,.92);color:var(--text2);text-transform:uppercase;z-index:1;
+}
+.ecard-body{padding:14px 16px 16px;display:flex;flex-direction:column;gap:7px;flex:1}
+.ecard-name{font-size:14.5px;font-weight:700;color:var(--text);line-height:1.3;letter-spacing:-.2px}
+.ecard-meta{display:flex;align-items:center;gap:5px;font-size:11.5px;color:var(--text2);font-weight:500}
+.ecard-meta i{font-size:13px;color:var(--text3)}
+.ecard-hosted{
+  display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--green);font-weight:600;
+  background:var(--green-light);padding:4px 10px;border-radius:999px;width:fit-content;margin-top:2px;
+}
+.ecard-hosted i{font-size:12px}
+.ecard-desc{font-size:12px;color:var(--text2);line-height:1.55;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;flex:1}
+.ecard-footer{display:flex;align-items:center;justify-content:space-between;padding-top:10px;border-top:1px solid var(--border);margin-top:auto;gap:8px}
+.pay-chip{
+  display:flex;align-items:center;gap:5px;padding:7px 13px;border-radius:999px;font-size:12px;font-weight:700;
+  transition:all .15s;flex-shrink:0;border:none;
+}
+.pay-chip.upi{background:var(--accent-light);color:var(--accent)}
+.pay-chip.qr{background:var(--orange-light);color:var(--orange)}
+.pay-chip.link{background:#e8f8ee;color:var(--green)}
+.pay-chip:hover{filter:brightness(.95);transform:scale(1.03)}
+.pay-chip i{font-size:13px}
+
+/* ── SKELETON ── */
+.skeleton{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius);padding:18px;display:flex;flex-direction:column;gap:12px}
+.skel-line{background:var(--surface2);border-radius:6px;animation:shimmer 1.4s infinite}
+@keyframes shimmer{0%,100%{opacity:.5}50%{opacity:1}}
+
+/* ── EMPTY ── */
+.empty{grid-column:1/-1;padding:80px 0;display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center}
+.empty i{font-size:48px;color:var(--border2)}
+.empty p{font-size:15px;color:var(--text2);font-weight:500}
+.empty small{font-size:13px;color:var(--text3)}
+
+/* ── OVERLAY / MODAL SHARED ── */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);backdrop-filter:blur(4px);z-index:500;display:none;align-items:center;justify-content:center;padding:20px}
+.overlay.open{display:flex}
+.modal{
+  background:var(--surface);border:1px solid var(--border);border-radius:20px;width:100%;max-width:520px;
+  padding:28px;animation:modalIn .2s ease both;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.15);
+}
+@keyframes modalIn{from{opacity:0;transform:translateY(12px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
+.modal-header{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:22px}
+.modal-title{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--text)}
+.modal-sub{font-size:13px;color:var(--text2);margin-top:4px}
+.modal-close{
+  width:32px;height:32px;border-radius:50%;border:1.5px solid var(--border2);background:transparent;
+  color:var(--text2);font-size:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .12s;
+}
+.modal-close:hover{background:var(--surface2);color:var(--text)}
+.field{margin-bottom:16px}
+.field label{display:block;font-size:12px;font-weight:700;color:var(--text2);letter-spacing:.4px;margin-bottom:7px;text-transform:uppercase}
+.field input,.field textarea,.field select{
+  width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--radius-sm);
+  padding:12px 14px;color:var(--text);font-size:14px;font-family:inherit;outline:none;
+  transition:border-color .15s,box-shadow .15s;resize:none;appearance:none;
+}
+.field input:focus,.field textarea:focus,.field select:focus{border-color:var(--green);background:#fff;box-shadow:0 0 0 3px rgba(26,122,94,.08)}
+.field-hint{font-size:11px;color:var(--text3);margin-top:6px;line-height:1.5}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.modal-btns{display:flex;gap:10px;margin-top:22px}
+.btn-cancel{flex:1;padding:13px 0;border-radius:999px;border:1.5px solid var(--border2);background:transparent;color:var(--text2);font-size:13px;font-weight:600;transition:all .15s}
+.btn-cancel:hover{background:var(--surface2);color:var(--text);border-color:var(--text3)}
+.btn-submit{
+  flex:2;padding:13px 0;border-radius:999px;border:none;background:var(--green);color:#fff;font-size:13px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;gap:7px;transition:all .15s;box-shadow:0 2px 8px rgba(26,122,94,.25);
+}
+.btn-submit:hover{background:var(--green-mid);box-shadow:0 4px 14px rgba(26,122,94,.35)}
+.btn-submit:disabled{opacity:.6;cursor:not-allowed}
+.gate-msg{
+  background:var(--surface2);border:1.5px dashed var(--border2);border-radius:var(--radius-sm);
+  padding:20px;text-align:center;color:var(--text2);font-size:13px;line-height:1.7;
+}
+.gate-msg i{font-size:26px;color:var(--text3);display:block;margin-bottom:8px}
+
+/* ── PAYMENT TYPE TOGGLE ── */
+.paytype-row{display:flex;gap:8px;margin-bottom:10px}
+.paytype-btn{
+  flex:1;padding:9px 6px;border-radius:var(--radius-sm);border:1.5px solid var(--border2);background:var(--surface);
+  font-size:12px;font-weight:500;color:var(--text2);cursor:pointer;text-align:center;transition:all .12s;
+  display:flex;align-items:center;justify-content:center;gap:5px;
+}
+.paytype-btn:hover{border-color:var(--text3);color:var(--text);background:var(--surface2)}
+.paytype-btn.sel-upi{background:var(--accent-light);border-color:var(--accent);color:var(--accent);font-weight:600}
+.paytype-btn.sel-qr_url{background:var(--orange-light);border-color:var(--orange);color:var(--orange);font-weight:600}
+.paytype-btn.sel-link{background:#e8f8ee;border-color:var(--green);color:var(--green);font-weight:600}
+
+/* ── DETAIL MODAL ── */
+.detail-modal{background:var(--surface);border:1px solid var(--border);border-radius:20px;width:100%;max-width:520px;overflow:hidden;animation:modalIn .2s ease both;max-height:92vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.15)}
+.detail-banner{height:140px;display:flex;align-items:center;justify-content:center;position:relative;flex-shrink:0}
+.detail-banner-close{position:absolute;top:12px;right:12px;width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.85);border:1px solid rgba(0,0,0,.1);color:var(--text2);font-size:15px;display:flex;align-items:center;justify-content:center;transition:background .12s}
+.detail-banner-close:hover{background:#fff}
+.detail-body{padding:24px;overflow-y:auto;flex:1}
+.detail-name{font-family:'Syne',sans-serif;font-size:21px;font-weight:800;color:var(--text);letter-spacing:-.4px;margin-bottom:10px}
+.detail-meta-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.detail-meta-item{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text2);font-weight:500;background:var(--surface2);padding:7px 13px;border-radius:999px;border:1px solid var(--border)}
+.detail-meta-item i{font-size:14px;color:var(--text3)}
+.detail-section-lbl{font-size:11px;font-weight:700;color:var(--text3);letter-spacing:.5px;margin-bottom:8px;text-transform:uppercase}
+.detail-desc{font-size:14.5px;color:var(--text2);line-height:1.7;margin-bottom:20px}
+.detail-footer{padding:16px 24px 24px;border-top:1px solid var(--border);flex-shrink:0}
+.detail-pay-btn{
+  width:100%;padding:14px 0;border-radius:999px;border:none;color:#fff;font-size:15px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;gap:9px;transition:all .15s;text-decoration:none;
+}
+.detail-pay-btn.upi{background:var(--accent)}
+.detail-pay-btn.qr{background:var(--orange)}
+.detail-pay-btn.link{background:var(--green)}
+.detail-pay-btn:hover{filter:brightness(1.08)}
+.qr-preview{max-width:220px;display:block;margin:14px auto 0;border-radius:12px;border:1px solid var(--border)}
+
+/* ── DATE RANGE POPOVER ── */
+.dr-popover{
+  position:absolute;top:calc(100% + 8px);left:0;background:var(--surface);border:1px solid var(--border);
+  border-radius:16px;box-shadow:0 16px 48px rgba(0,0,0,.18);z-index:300;display:none;overflow:hidden;
+  width:min(640px,92vw);
+}
+.dr-popover.open{display:block}
+.dr-summary{background:var(--green-light);color:var(--green);padding:14px 20px;font-size:13px;font-weight:700;display:flex;align-items:center;gap:8px}
+.dr-body{display:flex;gap:0;padding:18px 20px 8px;flex-wrap:wrap}
+.dr-month{flex:1;min-width:230px}
+.dr-month-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;padding:0 2px}
+.dr-month-head span{font-size:13px;font-weight:700;color:var(--text)}
+.dr-nav{width:24px;height:24px;border-radius:50%;border:none;background:transparent;color:var(--text3);display:flex;align-items:center;justify-content:center;transition:all .12s}
+.dr-nav:hover{background:var(--surface2);color:var(--text)}
+.dr-weekdays{display:grid;grid-template-columns:repeat(7,1fr);margin-bottom:4px}
+.dr-weekdays span{font-size:10px;font-weight:700;color:var(--text3);text-align:center;padding:4px 0}
+.dr-days{display:grid;grid-template-columns:repeat(7,1fr);gap:1px}
+.dr-day{
+  aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--text);
+  cursor:pointer;border-radius:8px;transition:all .1s;position:relative;
+}
+.dr-day:hover:not(.dr-disabled){background:var(--surface2)}
+.dr-day.dr-muted{color:var(--border2);cursor:default}
+.dr-day.dr-disabled{color:var(--border2);cursor:not-allowed}
+.dr-day.dr-in-range{background:var(--green-light);border-radius:0}
+.dr-day.dr-start{background:var(--green);color:#fff;font-weight:700;border-radius:8px 0 0 8px}
+.dr-day.dr-end{background:var(--green);color:#fff;font-weight:700;border-radius:0 8px 8px 0}
+.dr-day.dr-start.dr-end{border-radius:8px}
+.dr-day.dr-today:not(.dr-start):not(.dr-end)::after{content:'';position:absolute;bottom:3px;width:4px;height:4px;border-radius:50%;background:var(--green)}
+.dr-presets{display:flex;gap:8px;flex-wrap:wrap;padding:14px 20px;border-top:1px solid var(--border)}
+.dr-preset{padding:6px 14px;border-radius:999px;border:1.5px solid var(--border2);background:var(--surface);color:var(--text2);font-size:12px;font-weight:600;transition:all .12s}
+.dr-preset:hover{border-color:var(--green);color:var(--green);background:var(--green-light)}
+.dr-actions{display:flex;gap:10px;padding:0 20px 18px;justify-content:flex-end}
+.dr-apply{padding:9px 20px;border-radius:999px;border:none;background:var(--green);color:#fff;font-size:13px;font-weight:700}
+.dr-clear{padding:9px 16px;border-radius:999px;border:1.5px solid var(--border2);background:transparent;color:var(--text2);font-size:13px;font-weight:600}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(20px);background:#1a1814;color:#fff;padding:11px 22px;border-radius:999px;font-size:13px;font-weight:500;display:flex;align-items:center;gap:8px;opacity:0;pointer-events:none;transition:all .3s ease;z-index:999;white-space:nowrap;box-shadow:0 4px 20px rgba(0,0,0,.2)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast i{font-size:15px}
+.toast.error{background:#c2185b}
+
+/* ── AUTH MODAL ── */
+.otp-sent{background:var(--green-light);color:var(--green);border-radius:var(--radius-sm);padding:14px;font-size:13px;text-align:center;line-height:1.6;display:none}
+.otp-sent.show{display:block}
+
+footer{border-top:1px solid var(--border);padding:24px 32px;max-width:1600px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+
+@media(max-width:800px){
+  .header{padding:0 16px}
+  .hero{padding:28px 16px 0}
+  .hero h1{font-size:28px}
+  .filters-wrap,.main-wrap{padding-left:16px;padding-right:16px}
+  .back-link span{display:none}
+  .dr-body{flex-direction:column}
+  .dr-month:nth-child(2){display:none}
+  .field-row{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="logo">Close<span>.</span>Connect</div>
+  <a href="index.html" class="back-link"><i class="ti ti-arrow-left"></i><span>Communities</span></a>
+  <div class="header-right">
+    <button class="auth-btn" id="auth-btn" onclick="handleAuthBtn()">
+      <i class="ti ti-user-circle"></i><span id="auth-btn-label">Sign in</span>
+    </button>
+    <button class="add-btn" onclick="openAddEvent()"><i class="ti ti-plus"></i>Add Event</button>
+  </div>
+</header>
+
+<!-- HERO -->
+<div class="hero">
+  <h1>What's <em>Happening</em><br/>Around You</h1>
+  <p>Meetups, workshops, and socials hosted by communities near you — filter by what fits your week.</p>
+</div>
+
+<!-- FILTERS -->
+<div class="filters-wrap">
+  <div class="filter-group">
+    <select class="filter-select" id="filter-category" onchange="onFilterChange('category',this)">
+      <option value="">All Categories</option>
+    </select>
+    <select class="filter-select" id="filter-city" onchange="onFilterChange('city',this)">
+      <option value="">All Cities</option>
+    </select>
+    <select class="filter-select" id="filter-community" onchange="onFilterChange('community',this)">
+      <option value="">All Communities</option>
+    </select>
+    <div style="position:relative">
+      <button class="daterange-btn" id="dr-btn" onclick="toggleDrPopover()">
+        <i class="ti ti-calendar"></i><span id="dr-btn-label">Any Date</span>
+      </button>
+      <div class="dr-popover" id="dr-popover"></div>
+    </div>
+    <button class="clear-filters" onclick="clearAllFilters()"><i class="ti ti-x" style="font-size:12px"></i>Clear</button>
+  </div>
+</div>
+
+<!-- GRID -->
+<div class="main-wrap">
+  <div class="grid" id="event-grid"></div>
+  <div id="scroll-sentinel" style="height:48px;display:flex;align-items:center;justify-content:center">
+    <span id="scroll-status" style="font-size:13px;color:var(--text3)"></span>
+  </div>
+</div>
+
+<!-- EVENT DETAIL MODAL -->
+<div class="overlay" id="detail-overlay" onclick="closeDetailOutside(event)">
+  <div class="detail-modal">
+    <div class="detail-banner" id="dm-banner">
+      <img id="dm-banner-img" src="" alt="" style="width:100%;height:100%;object-fit:cover;position:absolute;top:0;left:0"/>
+      <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,0.1) 0%,rgba(0,0,0,0.45) 100%)"></div>
+      <button class="detail-banner-close" onclick="closeDetail()" style="position:absolute;top:12px;right:12px;z-index:2"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="detail-body">
+      <div class="detail-name" id="dm-name"></div>
+      <div class="detail-meta-row" id="dm-meta"></div>
+      <div class="detail-section-lbl">about this event</div>
+      <div class="detail-desc" id="dm-desc"></div>
+    </div>
+    <div class="detail-footer" id="dm-footer"></div>
+  </div>
+</div>
+
+<!-- ADD EVENT MODAL -->
+<div class="overlay" id="event-overlay" onclick="closeEventModalOutside(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title">Add an Event</div>
+        <div class="modal-sub">List an event under your claimed community</div>
+      </div>
+      <button class="modal-close" onclick="closeEventModal()"><i class="ti ti-x"></i></button>
+    </div>
+
+    <div id="event-gate-msg" class="gate-msg" style="display:none">
+      <i class="ti ti-lock"></i>
+      <span id="gate-msg-text">Sign in to add an event.</span>
+    </div>
+
+    <form id="event-form" style="display:none">
+      <div class="field">
+        <label>Hosting Community</label>
+        <select id="ev-community"></select>
+        <div class="field-hint">Only communities you've claimed and had approved appear here.</div>
+      </div>
+      <div class="field">
+        <label>Event Name</label>
+        <input type="text" id="ev-name" placeholder="e.g. Sunset Trail Run" maxlength="120"/>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label>Date</label>
+          <input type="date" id="ev-date"/>
+        </div>
+        <div class="field">
+          <label>Time <span style="color:var(--text3);font-weight:400;text-transform:none">(optional)</span></label>
+          <input type="time" id="ev-time"/>
+        </div>
+      </div>
+      <div class="field">
+        <label>Venue</label>
+        <input type="text" id="ev-venue" placeholder="e.g. Cubbon Park, Main Gate" maxlength="150"/>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label>City</label>
+          <select id="ev-city"></select>
+        </div>
+        <div class="field">
+          <label>Category</label>
+          <select id="ev-category"></select>
+        </div>
+      </div>
+      <div class="field">
+        <label>Description</label>
+        <textarea id="ev-desc" rows="3" placeholder="what's the plan? who should come?" maxlength="500"></textarea>
+        <div class="field-hint" id="ev-desc-count" style="text-align:right">0 / 500</div>
+      </div>
+      <div class="field">
+        <label>Payment <span style="color:var(--text3);font-weight:400;text-transform:none">(optional — leave blank if free)</span></label>
+        <div class="paytype-row">
+          <button type="button" class="paytype-btn" id="pt-upi" onclick="setPayType('upi')"><i class="ti ti-brand-google-pay"></i>UPI ID</button>
+          <button type="button" class="paytype-btn" id="pt-qr_url" onclick="setPayType('qr_url')"><i class="ti ti-qrcode"></i>QR Image URL</button>
+          <button type="button" class="paytype-btn" id="pt-link" onclick="setPayType('link')"><i class="ti ti-link"></i>Payment Link</button>
+        </div>
+        <input type="text" id="ev-pay-value" placeholder="e.g. yourname@okhdfcbank" maxlength="300"/>
+        <div id="qr-upload-row" style="display:none;margin-top:8px">
+          <label style="display:flex;align-items:center;gap:8px;padding:10px 14px;border:1.5px dashed var(--border2);border-radius:var(--radius-sm);cursor:pointer;font-size:12px;color:var(--text2);font-weight:600">
+            <i class="ti ti-upload" style="font-size:16px"></i>
+            <span id="qr-upload-label">Or upload a QR image instead</span>
+            <input type="file" id="qr-file-input" accept="image/*" style="display:none" onchange="uploadQr(this)"/>
+          </label>
+          <img id="qr-preview-thumb" style="display:none;max-width:120px;border-radius:8px;border:1px solid var(--border);margin-top:8px"/>
+        </div>
+        <div class="field-hint" id="pay-hint">Select a payment type above if this event isn't free.</div>
+      </div>
+      <div class="modal-btns">
+        <button type="button" class="btn-cancel" onclick="closeEventModal()">Cancel</button>
+        <button type="button" class="btn-submit" id="event-submit-btn" onclick="submitEvent()">
+          <i class="ti ti-calendar-plus"></i>Add Event
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- SIGN IN MODAL -->
+<div class="overlay" id="auth-overlay" onclick="closeAuthOutside(event)">
+  <div class="modal" style="max-width:400px">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title">Sign In</div>
+        <div class="modal-sub">We'll email you a magic link — no password needed</div>
+      </div>
+      <button class="modal-close" onclick="closeAuthModal()"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="field">
+      <label>Email</label>
+      <input type="email" id="auth-email" placeholder="you@example.com"/>
+    </div>
+    <div class="otp-sent" id="otp-sent">
+      <i class="ti ti-mail-check" style="font-size:20px;display:block;margin-bottom:6px"></i>
+      Check your inbox — click the link to sign in. You can close this window.
+    </div>
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closeAuthModal()">Cancel</button>
+      <button class="btn-submit" id="auth-send-btn" onclick="sendMagicLink()">
+        <i class="ti ti-send"></i>Send Magic Link
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <span style="font-family:'Syne',sans-serif;font-weight:800;font-size:16px;color:var(--text)">Close<span style="color:var(--green)">.</span>Connect</span>
+  <span style="font-size:13px;color:var(--text3)">queries or concerns? <a href="mailto:closeconnect27@gmail.com" style="color:var(--green);font-weight:600;text-decoration:none">closeconnect27@gmail.com</a></span>
+</footer>
+
+<!-- TOAST -->
+<div class="toast" id="toast"><i class="ti ti-circle-check"></i><span id="toast-msg">done!</span></div>
+
+<script>
+// ── CONFIG ──
+const SUPABASE_URL  = 'https://vcfrezqaagrmgxrtmvwg.supabase.co'
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZjZnJlenFhYWdybWd4cnRtdndnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEwNTgzNzgsImV4cCI6MjA5NjYzNDM3OH0.CL-i8tus0pjAKnPNZSm5D1V7Q3va6mwIFOfPQwC3EdY'
+// Same UUID you inserted into app_settings ('admin_uid'). Used client-side only to decide
+// which communities to list in the Add Event form — actual permission is enforced by RLS.
+const ADMIN_UID = 'PASTE-YOUR-ADMIN-UUID-HERE'
+// ──────────────────────────────────────────
+
+const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON)
+
+const CITY_LIST = ['Bengaluru','Mumbai','Delhi','Chennai','Hyderabad','Pune','Kolkata','Ahmedabad','Jaipur','Surat','Lucknow','Kochi','Indore','Bhopal','Chandigarh','Nagpur','Visakhapatnam','Coimbatore','Thiruvananthapuram','Patna']
+
+const CAT_VISUALS = {
+  sports:{grad:'linear-gradient(135deg,#0a3d1f 0%,#22c55e 100%)'},
+  tech:{grad:'linear-gradient(135deg,#1e1b4b 0%,#6366f1 100%)'},
+  arts:{grad:'linear-gradient(135deg,#4a0e0e 0%,#f87171 100%)'},
+  food:{grad:'linear-gradient(135deg,#431407 0%,#fb923c 100%)'},
+  music:{grad:'linear-gradient(135deg,#1a0533 0%,#c084fc 100%)'},
+  wellness:{grad:'linear-gradient(135deg,#064e3b 0%,#34d399 100%)'},
+  gaming:{grad:'linear-gradient(135deg,#0c0a1e 0%,#7c3aed 100%)'},
+  travel:{grad:'linear-gradient(135deg,#0c2a4a 0%,#60a5fa 100%)'},
+  photography:{grad:'linear-gradient(135deg,#111827 0%,#9ca3af 100%)'},
+  social:{grad:'linear-gradient(135deg,#4a1942 0%,#f472b6 100%)'},
+  books:{grad:'linear-gradient(135deg,#1c1a0a 0%,#facc15 100%)'},
+  pets:{grad:'linear-gradient(135deg,#0f2a1e 0%,#4ade80 100%)'},
+  parenting:{grad:'linear-gradient(135deg,#3b0764 0%,#a78bfa 100%)'},
+  education:{grad:'linear-gradient(135deg,#0a2342 0%,#3b82f6 100%)'},
+  finance:{grad:'linear-gradient(135deg,#064e3b 0%,#10b981 100%)'},
+  business:{grad:'linear-gradient(135deg,#172554 0%,#3b82f6 100%)'},
+  lgbtq:{grad:'linear-gradient(135deg,#7f1d1d 0%,#ec4899 100%)'},
+  jobs:{grad:'linear-gradient(135deg,#0f172a 0%,#6366f1 100%)'},
+  beauty:{grad:'linear-gradient(135deg,#4a0a2e 0%,#ec4899 100%)'},
+  shopping:{grad:'linear-gradient(135deg,#1a0a3e 0%,#8b5cf6 100%)'},
+  other:{grad:'linear-gradient(135deg,#1f2937 0%,#6b7280 100%)'},
+  default:{grad:'linear-gradient(135deg,#1a1a1a 0%,#374151 100%)'},
+}
+function getCatVisual(slug){ return CAT_VISUALS[slug] || CAT_VISUALS.default }
+
+// ── EVENT CATEGORY IMAGES — deliberately different photo IDs than the community cards ──
+const EVENT_CAT_IMAGES = {
+  sports:['photo-1547347298-4074fc3086f0','photo-1517836357463-d25dfeac3438','photo-1526676037777-05a232554f77','photo-1571008887538-b36bb32f4571','photo-1500530855697-b586d89ba3ee'],
+  tech:['photo-1531482615713-2afd69097998','photo-1522071820081-009f0129c71c','photo-1556761175-5973dc0f32e7','photo-1552664730-d307ca884978','photo-1573164713988-8665fc963095'],
+  arts:['photo-1547891654-e66ed7ebb968','photo-1499781350541-7783f6c6a0c8','photo-1547153760-18fc86324498','photo-1531058020387-3be344556be6'],
+  food:['photo-1555939594-58d7cb561ad1','photo-1544025162-d76694265947','photo-1508615039623-a25605d2b022','photo-1517248135467-4c7edcad34c4'],
+  music:['photo-1470229722913-7c0e2dbbafd3','photo-1524368535928-5b5e00ddc76b','photo-1508973379184-7517410fb0bc','photo-1516450360452-9312f5e86fc7'],
+  wellness:['photo-1599901860904-17e6ed7083a0','photo-1591228127791-8e2eaef098d3','photo-1599447292180-45fd84092ef8'],
+  gaming:['photo-1560253023-3ec5d502959f','photo-1580327344181-c1163234e5a0','photo-1580234811497-9df7fd2f357e','photo-1493711662062-fa541adb3fc8'],
+  travel:['photo-1436491865332-7a61a109cc05','photo-1469854523086-cc02fe5d8800','photo-1500835556837-99ac94a94552'],
+  photography:['photo-1552168324-d612d77725e3','photo-1533228876829-65c94e7b5025','photo-1471897488648-5eae4ac6686b','photo-1512790182412-b19e6d62bc39'],
+  social:['photo-1511578314322-379afb476865','photo-1543007630-9710e4a00a20','photo-1543007631-283050bb3e8c'],
+  books:['photo-1524578271613-d550eacf6090','photo-1509266272358-7701da638078','photo-1521123845560-14093637aa7d'],
+  pets:['photo-1518020382113-a7e8fc38eac9','photo-1601758228041-f3b2795255f1'],
+  parenting:['photo-1560729829-9942ccc50bd6','photo-1502086223501-7ea6ecd79368','photo-1541692641319-981cc79ee10a'],
+  education:['photo-1524178232363-1fb2b075b655','photo-1571260899304-425eee4c7efc','photo-1523240795612-9a054b0db644'],
+  finance:['photo-1560472354-b33ff0c44a43','photo-1607944024060-0450380ddd33','photo-1526304640581-d334cdbbf45e'],
+  business:['photo-1475721027785-f74eccf877e2','photo-1560439514-4e9645039924','photo-1556155092-490a1ba16284','photo-1560250097-0b93528c311a'],
+  lgbtq:['photo-1591189863430-ab87e120f312','photo-1541532713592-79a0317b6b77'],
+  jobs:['photo-1521791055366-0d553872125f','photo-1560523159-4a9692d222f8','photo-1568992688065-536aad8a12f6'],
+  beauty:['photo-1512207736890-6ea1e2b0a5aa','photo-1522337360788-8b13dee7a37e','photo-1560066984-138dadb4c035'],
+  shopping:['photo-1555396273-367ea4eb4db5','photo-1441984904996-e0b6ba687e04'],
+  other:['photo-1511795409834-ef04bbd61622','photo-1543269664-56d93c1b41a6'],
+}
+function getEventCatImage(slug, seed) {
+  var ids = EVENT_CAT_IMAGES[slug] || EVENT_CAT_IMAGES.other
+  var id = ids[Math.abs(seed || 0) % ids.length]
+  return 'https://images.unsplash.com/' + id + '?w=640&h=360&fit=crop&q=80&auto=format'
+}
+
+// ── STATE ──
+let cats = []
+let session = null
+let hostableCommunities = []
+let allCommunities = []
+let filters = { category:'', city:'', community:'', from:'', to:'' }
+let page = 0, PER_PAGE = 18, isLoading = false, allLoaded = false
+let selPayType = ''
+
+// ── INIT ──
+async function init() {
+  showSkeletons()
+  const { data: { session: s } } = await db.auth.getSession()
+  session = s
+  updateAuthUi()
+  db.auth.onAuthStateChange((_evt, s2) => { session = s2; updateAuthUi() })
+
+  const { data: catData } = await db.from('categories').select('*').order('sort_order')
+  cats = catData || []
+  populateSelect('filter-category', cats.map(c => ({v:c.slug, l:c.name})), 'All Categories')
+  populateSelect('ev-category', cats.map(c => ({v:c.slug, l:c.name})), null, true)
+  populateSelect('filter-city', CITY_LIST.map(c => ({v:c, l:c})), 'All Cities')
+  populateSelect('ev-city', CITY_LIST.map(c => ({v:c, l:c})), null, true)
+
+  const { data: comms } = await db.from('communities').select('id,name').eq('status','active').order('name')
+  allCommunities = comms || []
+  populateSelect('filter-community', allCommunities.map(c => ({v:c.id, l:c.name})), 'All Communities')
+
+  buildDrPopover()
+  await loadEvents()
+  setupInfiniteScroll()
+}
+
+function populateSelect(id, items, placeholder, keepFirst) {
+  const el = document.getElementById(id)
+  if (!el) return
+  const firstOpt = keepFirst ? el.querySelector('option') : null
+  el.innerHTML = ''
+  if (placeholder) el.appendChild(new Option(placeholder, ''))
+  if (firstOpt) el.appendChild(firstOpt)
+  items.forEach(it => el.appendChild(new Option(it.l, it.v)))
+}
+
+// ── AUTH ──
+function updateAuthUi() {
+  const btn = document.getElementById('auth-btn')
+  const label = document.getElementById('auth-btn-label')
+  if (session) {
+    btn.classList.add('signed-in')
+    label.textContent = session.user.email.split('@')[0]
+  } else {
+    btn.classList.remove('signed-in')
+    label.textContent = 'Sign in'
+  }
+}
+function handleAuthBtn() {
+  if (session) {
+    if (confirm('Sign out of ' + session.user.email + '?')) db.auth.signOut()
+  } else {
+    openAuthModal()
+  }
+}
+function openAuthModal() {
+  document.getElementById('otp-sent').classList.remove('show')
+  document.getElementById('auth-email').value = ''
+  document.getElementById('auth-overlay').classList.add('open')
+  document.body.style.overflow = 'hidden'
+}
+function closeAuthModal() {
+  document.getElementById('auth-overlay').classList.remove('open')
+  document.body.style.overflow = ''
+}
+function closeAuthOutside(e){ if (e.target === document.getElementById('auth-overlay')) closeAuthModal() }
+
+async function sendMagicLink() {
+  const email = document.getElementById('auth-email').value.trim()
+  if (!email || !email.includes('@')) { toast('Enter a valid email.', true); return }
+  const btn = document.getElementById('auth-send-btn')
+  btn.disabled = true
+  btn.innerHTML = '<i class="ti ti-loader-2" style="animation:spin 1s linear infinite"></i> sending…'
+  const { error } = await db.auth.signInWithOtp({ email, options: { emailRedirectTo: window.location.href } })
+  btn.disabled = false
+  btn.innerHTML = '<i class="ti ti-send"></i>Send Magic Link'
+  if (error) { toast('Could not send link — try again.', true); return }
+  document.getElementById('otp-sent').classList.add('show')
+}
+
+// ── HOSTABLE COMMUNITIES (for Add Event form) ──
+async function loadHostableCommunities() {
+  if (!session) { hostableCommunities = []; return }
+  if (session.user.id === ADMIN_UID) {
+    const { data } = await db.from('communities').select('id,name').eq('status','active').order('name')
+    hostableCommunities = data || []
+  } else {
+    const { data } = await db.from('communities').select('id,name')
+      .eq('claimed_by_user_id', session.user.id).eq('claim_status','approved').order('name')
+    hostableCommunities = data || []
+  }
+}
+
+// ── ADD EVENT MODAL ──
+async function openAddEvent() {
+  document.getElementById('event-overlay').classList.add('open')
+  document.body.style.overflow = 'hidden'
+  const gate = document.getElementById('event-gate-msg')
+  const form = document.getElementById('event-form')
+  if (!session) {
+    gate.style.display = 'block'; form.style.display = 'none'
+    document.getElementById('gate-msg-text').innerHTML = 'Sign in to add an event. <a href="#" onclick="closeEventModal();openAuthModal();return false" style="color:var(--green);font-weight:700">Sign in now</a>'
+    return
+  }
+  await loadHostableCommunities()
+  if (!hostableCommunities.length) {
+    gate.style.display = 'block'; form.style.display = 'none'
+    document.getElementById('gate-msg-text').textContent = "You haven't claimed a community yet, or your claim is still pending approval. Once approved, it'll show up here."
+    return
+  }
+  gate.style.display = 'none'; form.style.display = 'block'
+  populateSelect('ev-community', hostableCommunities.map(c => ({v:c.id, l:c.name})))
+}
+function closeEventModal() {
+  document.getElementById('event-overlay').classList.remove('open')
+  document.body.style.overflow = ''
+}
+function closeEventModalOutside(e){ if (e.target === document.getElementById('event-overlay')) closeEventModal() }
+
+document.addEventListener('DOMContentLoaded', () => {
+  const descEl = document.getElementById('ev-desc')
+  if (descEl) descEl.addEventListener('input', function() {
+    document.getElementById('ev-desc-count').textContent = this.value.length + ' / 500'
+  })
+})
+
+function setPayType(type) {
+  selPayType = (selPayType === type) ? '' : type
+  document.querySelectorAll('.paytype-btn').forEach(b => b.classList.remove('sel-upi','sel-qr_url','sel-link'))
+  const input = document.getElementById('ev-pay-value')
+  const hint = document.getElementById('pay-hint')
+  const uploadRow = document.getElementById('qr-upload-row')
+  if (!selPayType) { hint.textContent = "Select a payment type above if this event isn't free."; input.placeholder = ''; uploadRow.style.display = 'none'; return }
+  document.getElementById('pt-' + selPayType).classList.add('sel-' + selPayType)
+  if (selPayType === 'upi') { input.placeholder = 'e.g. yourname@okhdfcbank'; hint.textContent = 'Your UPI ID — attendees will copy this to pay.'; uploadRow.style.display = 'none' }
+  else if (selPayType === 'qr_url') { input.placeholder = 'https://…/your-qr-code.png (or upload below)'; hint.textContent = 'Paste a link to your QR image, or upload one directly.'; uploadRow.style.display = 'block' }
+  else { input.placeholder = 'https://razorpay.me/… or similar'; hint.textContent = 'A payment link attendees can open directly.'; uploadRow.style.display = 'none' }
+}
+
+async function uploadQr(inputEl) {
+  const file = inputEl.files[0]
+  if (!file) return
+  if (!session) { toast('Please sign in first.', true); inputEl.value = ''; return }
+  if (file.size > 3 * 1024 * 1024) { toast('Image must be under 3MB.', true); inputEl.value = ''; return }
+  const label = document.getElementById('qr-upload-label')
+  label.textContent = 'Uploading…'
+  const ext = (file.name.split('.').pop() || 'png').toLowerCase()
+  const path = session.user.id + '/' + Date.now() + '.' + ext
+  const { error } = await db.storage.from('event-qr').upload(path, file, { upsert: false })
+  if (error) { toast('Upload failed — try again.', true); label.textContent = 'Or upload a QR image instead'; inputEl.value = ''; return }
+  const { data: pub } = db.storage.from('event-qr').getPublicUrl(path)
+  document.getElementById('ev-pay-value').value = pub.publicUrl
+  const thumb = document.getElementById('qr-preview-thumb')
+  thumb.src = pub.publicUrl
+  thumb.style.display = 'block'
+  label.textContent = 'Uploaded ✓ — choose a different file to replace'
+}
+
+function sanitise(s, max) { return String(s).replace(/<[^>]*>/g,'').replace(/[<>"']/g,'').trim().slice(0, max) }
+
+async function submitEvent() {
+  if (!session) { toast('Please sign in first.', true); return }
+  const communityId = document.getElementById('ev-community').value
+  const name = sanitise(document.getElementById('ev-name').value.trim(), 120)
+  const date = document.getElementById('ev-date').value
+  const time = document.getElementById('ev-time').value || null
+  const venue = sanitise(document.getElementById('ev-venue').value.trim(), 150)
+  const city = document.getElementById('ev-city').value
+  const category = document.getElementById('ev-category').value
+  const desc = sanitise(document.getElementById('ev-desc').value.trim(), 500)
+  const payValue = sanitise(document.getElementById('ev-pay-value').value.trim(), 300)
+
+  if (!communityId || !name || !date || !venue || !city || !category) {
+    toast('Please fill in all required fields.', true); return
+  }
+  if (name.length < 3) { toast('Event name is too short.', true); return }
+  if (desc && desc.length < 10) { toast('Description should be at least 10 characters, or left blank.', true); return }
+  if (selPayType && !payValue) { toast('Add a payment value, or clear the payment type.', true); return }
+
+  const btn = document.getElementById('event-submit-btn')
+  btn.disabled = true
+  btn.innerHTML = '<i class="ti ti-loader-2" style="animation:spin 1s linear infinite"></i> adding…'
+
+  const { error } = await db.from('events').insert({
+    event_name: name,
+    event_date: date,
+    event_time: time,
+    venue: venue,
+    city: city,
+    category: category,
+    hosted_by_community_id: communityId,
+    payment_type: selPayType || null,
+    payment_value: selPayType ? payValue : null,
+    description: desc || null,
+    created_by_user_id: session.user.id,
+    status: 'active'
+  })
+
+  btn.disabled = false
+  btn.innerHTML = '<i class="ti ti-calendar-plus"></i>Add Event'
+
+  if (error) { toast('Could not add event — try again.', true); console.error(error); return }
+
+  toast('🎉 Event added!')
+  closeEventModal()
+  resetEventForm()
+  page = 0; allLoaded = false
+  loadEvents()
+}
+function resetEventForm() {
+  ['ev-name','ev-date','ev-time','ev-venue','ev-desc','ev-pay-value'].forEach(id => { const el = document.getElementById(id); if (el) el.value = '' })
+  document.getElementById('ev-desc-count').textContent = '0 / 500'
+  document.querySelectorAll('.paytype-btn').forEach(b => b.classList.remove('sel-upi','sel-qr_url','sel-link'))
+  selPayType = ''
+  document.getElementById('qr-upload-row').style.display = 'none'
+  document.getElementById('qr-preview-thumb').style.display = 'none'
+  document.getElementById('qr-file-input').value = ''
+  document.getElementById('qr-upload-label').textContent = 'Or upload a QR image instead'
+}
+
+// ── FILTERS ──
+function onFilterChange(key, sel) {
+  filters[key] = sel.value
+  sel.classList.toggle('active', sel.value !== '')
+  page = 0; allLoaded = false
+  loadEvents()
+}
+function clearAllFilters() {
+  filters = { category:'', city:'', community:'', from:'', to:'' }
+  document.querySelectorAll('.filter-select').forEach(s => { s.value=''; s.classList.remove('active') })
+  document.getElementById('dr-btn').classList.remove('active')
+  document.getElementById('dr-btn-label').textContent = 'Any Date'
+  drStart = null; drEnd = null
+  page = 0; allLoaded = false
+  loadEvents()
+}
+
+// ── LOAD EVENTS ──
+async function loadEvents(append) {
+  if (isLoading) return
+  isLoading = true
+  if (!append) { page = 0; showSkeletons() }
+  document.getElementById('scroll-status').textContent = ''
+
+  let query = db.from('events')
+    .select('*, communities(name,id)', { count:'exact' })
+    .eq('status','active')
+
+  if (filters.category) query = query.eq('category', filters.category)
+  if (filters.city) query = query.eq('city', filters.city)
+  if (filters.community) query = query.eq('hosted_by_community_id', filters.community)
+  if (filters.from) query = query.gte('event_date', filters.from)
+  if (filters.to) query = query.lte('event_date', filters.to)
+
+  query = query.order('event_date', { ascending: true }).range(page*PER_PAGE, page*PER_PAGE + PER_PAGE - 1)
+
+  const { data } = await query
+  if (append) appendGrid(data || []); else renderGrid(data || [])
+  allLoaded = (data || []).length < PER_PAGE
+  if (allLoaded && (data||[]).length) document.getElementById('scroll-status').textContent = 'All events loaded'
+  isLoading = false
+}
+
+// ── CARD BUILDING ──
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;') }
+function fmtDateBadge(dateStr) {
+  const d = new Date(dateStr + 'T00:00:00')
+  return { mon: d.toLocaleDateString('en-US',{month:'short'}), day: d.getDate() }
+}
+function fmtDateFull(dateStr, timeStr) {
+  const d = new Date(dateStr + 'T00:00:00')
+  let s = d.toLocaleDateString('en-US',{weekday:'short', day:'numeric', month:'short'})
+  if (timeStr) {
+    const [h,m] = timeStr.split(':')
+    const hh = ((+h % 12) || 12), ap = (+h >= 12 ? 'PM':'AM')
+    s += ' • ' + hh + ':' + m + ' ' + ap
+  }
+  return s
+}
+function payChip(ev) {
+  if (!ev.payment_type) return ''
+  if (ev.payment_type === 'upi') return '<button class="pay-chip upi" onclick="event.stopPropagation();copyUpi(\''+esc(ev.payment_value)+'\')"><i class="ti ti-brand-google-pay"></i>Pay UPI</button>'
+  if (ev.payment_type === 'qr_url') return '<button class="pay-chip qr" onclick="event.stopPropagation();openDetail(\''+ev.id+'\')"><i class="ti ti-qrcode"></i>View QR</button>'
+  return '<a class="pay-chip link" href="'+esc(ev.payment_value)+'" target="_blank" rel="noopener" onclick="event.stopPropagation()"><i class="ti ti-link"></i>Pay Online</a>'
+}
+function buildCard(ev) {
+  const vis = getCatVisual(ev.category)
+  const badge = fmtDateBadge(ev.event_date)
+  const communityName = ev.communities ? ev.communities.name : 'Community'
+  const catObj = cats.find(c => c.slug === ev.category)
+  const seed = (ev.id||'x').charCodeAt(0)||0
+  const imgSrc = getEventCatImage(ev.category, seed)
+  const parts = []
+  parts.push('<div class="ecard" onclick="openDetail(\''+ev.id+'\')">')
+  parts.push('<div class="ecard-banner" style="background:'+vis.grad+'">')
+  parts.push('<img src="'+imgSrc+'" alt="" style="width:100%;height:100%;object-fit:cover;position:absolute;top:0;left:0" loading="lazy" onerror="this.style.display=\'none\'">')
+  parts.push('<div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,0.1) 0%,rgba(0,0,0,0.4) 100%)"></div>')
+  parts.push('<div class="ecard-date-badge"><div class="d-mon">'+badge.mon+'</div><div class="d-day">'+badge.day+'</div></div>')
+  parts.push('<div class="ecard-cat-badge">'+esc(catObj ? catObj.name : ev.category)+'</div>')
+  parts.push('</div>')
+  parts.push('<div class="ecard-body">')
+  parts.push('<div class="ecard-name">'+esc(ev.event_name)+'</div>')
+  parts.push('<div class="ecard-meta"><i class="ti ti-clock"></i>'+fmtDateFull(ev.event_date, ev.event_time)+'</div>')
+  parts.push('<div class="ecard-meta"><i class="ti ti-map-pin"></i>'+esc(ev.venue)+', '+esc(ev.city)+'</div>')
+  parts.push('<div class="ecard-hosted"><i class="ti ti-users"></i>'+esc(communityName)+'</div>')
+  parts.push('<div class="ecard-desc">'+esc(ev.description||'')+'</div>')
+  parts.push('<div class="ecard-footer"><span></span>'+(payChip(ev) || '<span style="font-size:11px;color:var(--text3);font-weight:600">Free</span>')+'</div>')
+  parts.push('</div></div>')
+  return parts.join('')
+}
+function renderGrid(list) {
+  const grid = document.getElementById('event-grid')
+  if (!list.length) {
+    grid.innerHTML = '<div class="empty"><i class="ti ti-calendar-off"></i><p>No Events Found</p><small>Try different filters, or check back soon</small></div>'
+    return
+  }
+  grid.innerHTML = list.map(buildCard).join('')
+}
+function appendGrid(list) {
+  if (!list.length) return
+  document.getElementById('event-grid').insertAdjacentHTML('beforeend', list.map(buildCard).join(''))
+}
+function showSkeletons() {
+  document.getElementById('event-grid').innerHTML = Array(6).fill(0).map(() =>
+    '<div class="skeleton"><div class="skel-line" style="height:46px;width:46px;border-radius:10px"></div><div class="skel-line" style="height:14px;width:65%"></div><div class="skel-line" style="height:12px;width:100%"></div><div class="skel-line" style="height:12px;width:80%"></div></div>'
+  ).join('')
+}
+function setupInfiniteScroll() {
+  const sentinel = document.getElementById('scroll-sentinel')
+  const obs = new IntersectionObserver(entries => {
+    if (entries[0].isIntersecting && !isLoading && !allLoaded) { page++; loadEvents(true) }
+  }, { rootMargin:'200px' })
+  obs.observe(sentinel)
+}
+
+function copyUpi(id) {
+  navigator.clipboard.writeText(id).then(() => toast('UPI ID copied: ' + id))
+}
+
+// ── DETAIL MODAL ──
+async function openDetail(id) {
+  const { data: ev } = await db.from('events').select('*, communities(name,id)').eq('id', id).single()
+  if (!ev) return
+  const vis = getCatVisual(ev.category)
+  document.getElementById('dm-banner').style.background = vis.grad
+  const dmImg = document.getElementById('dm-banner-img')
+  if (dmImg) { dmImg.src = getEventCatImage(ev.category, (ev.id||'x').charCodeAt(0)||0); dmImg.style.display = ''; dmImg.onerror = function(){ this.style.display = 'none' } }
+  document.getElementById('dm-name').textContent = ev.event_name
+  const catObj = cats.find(c => c.slug === ev.category)
+  document.getElementById('dm-meta').innerHTML =
+    '<div class="detail-meta-item"><i class="ti ti-clock"></i>'+fmtDateFull(ev.event_date, ev.event_time)+'</div>'+
+    '<div class="detail-meta-item"><i class="ti ti-map-pin"></i>'+esc(ev.venue)+', '+esc(ev.city)+'</div>'+
+    '<div class="detail-meta-item"><i class="ti ti-users"></i>'+esc(ev.communities ? ev.communities.name : '')+'</div>'+
+    '<div class="detail-meta-item"><i class="ti ti-tag"></i>'+esc(catObj ? catObj.name : ev.category)+'</div>'
+  document.getElementById('dm-desc').textContent = ev.description || 'No description provided.'
+
+  let footer = ''
+  if (ev.payment_type === 'upi') {
+    footer = '<button class="detail-pay-btn upi" onclick="copyUpi(\''+esc(ev.payment_value)+'\')"><i class="ti ti-brand-google-pay"></i>Copy UPI ID — '+esc(ev.payment_value)+'</button>'
+  } else if (ev.payment_type === 'qr_url') {
+    footer = '<img class="qr-preview" src="'+esc(ev.payment_value)+'" alt="Payment QR"/>'
+  } else if (ev.payment_type === 'link') {
+    footer = '<a class="detail-pay-btn link" href="'+esc(ev.payment_value)+'" target="_blank" rel="noopener"><i class="ti ti-link"></i>Pay Online</a>'
+  } else {
+    footer = '<div style="text-align:center;font-size:13px;color:var(--text3);font-weight:600">This event is free to attend</div>'
+  }
+  document.getElementById('dm-footer').innerHTML = footer
+
+  document.getElementById('detail-overlay').classList.add('open')
+  document.body.style.overflow = 'hidden'
+}
+function closeDetail() { document.getElementById('detail-overlay').classList.remove('open'); document.body.style.overflow = '' }
+function closeDetailOutside(e){ if (e.target === document.getElementById('detail-overlay')) closeDetail() }
+
+// ── DATE RANGE POPOVER ──
+let drViewMonth = new Date(); drViewMonth.setDate(1)
+let drStart = null, drEnd = null
+
+function toggleDrPopover() {
+  const pop = document.getElementById('dr-popover')
+  const isOpen = pop.classList.contains('open')
+  if (isOpen) { pop.classList.remove('open'); return }
+  renderDrPopover()
+  pop.classList.add('open')
+}
+document.addEventListener('click', (e) => {
+  const pop = document.getElementById('dr-popover')
+  const btn = document.getElementById('dr-btn')
+  if (pop && pop.classList.contains('open') && !pop.contains(e.target) && e.target !== btn && !btn.contains(e.target)) {
+    pop.classList.remove('open')
+  }
+})
+function buildDrPopover() { renderDrPopover() }
+
+function isoDate(d) { return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0') }
+
+function renderDrPopover() {
+  const pop = document.getElementById('dr-popover')
+  const left = new Date(drViewMonth)
+  const right = new Date(drViewMonth); right.setMonth(right.getMonth()+1)
+  pop.innerHTML =
+    '<div class="dr-summary"><i class="ti ti-calendar"></i>'+drSummaryText()+'</div>'+
+    '<div class="dr-body">'+monthHtml(left,'left')+monthHtml(right,'right')+'</div>'+
+    '<div class="dr-presets">'+
+      '<button class="dr-preset" onclick="applyPreset(\'week\')">This Week</button>'+
+      '<button class="dr-preset" onclick="applyPreset(\'2weeks\')">Next 2 Weeks</button>'+
+      '<button class="dr-preset" onclick="applyPreset(\'month\')">This Month</button>'+
+    '</div>'+
+    '<div class="dr-actions"><button class="dr-clear" onclick="drClear()">Clear</button><button class="dr-apply" onclick="drApply()">Apply</button></div>'
+}
+function drSummaryText() {
+  if (!drStart) return 'Select a date range'
+  const s = new Date(drStart).toLocaleDateString('en-US',{day:'2-digit',month:'short',year:'numeric'})
+  if (!drEnd) return s + ' — pick end date'
+  const e = new Date(drEnd).toLocaleDateString('en-US',{day:'2-digit',month:'short',year:'numeric'})
+  return s + '  →  ' + e
+}
+function monthHtml(monthDate, side) {
+  const y = monthDate.getFullYear(), m = monthDate.getMonth()
+  const first = new Date(y,m,1)
+  const startPad = first.getDay()
+  const daysInMonth = new Date(y,m+1,0).getDate()
+  const monthLabel = first.toLocaleDateString('en-US',{month:'long', year:'numeric'})
+  let nav = '<div class="dr-month-head">'+
+    (side==='left' ? '<button class="dr-nav" onclick="drNav(-1)"><i class="ti ti-chevron-left"></i></button>' : '<span style="width:24px;display:inline-block"></span>')+
+    '<span>'+monthLabel+'</span>'+
+    (side==='right' ? '<button class="dr-nav" onclick="drNav(1)"><i class="ti ti-chevron-right"></i></button>' : '<span style="width:24px;display:inline-block"></span>')+
+  '</div>'
+  let wd = '<div class="dr-weekdays">'+['S','M','T','W','T','F','S'].map(d=>'<span>'+d+'</span>').join('')+'</div>'
+  let cells = ''
+  for (let i=0;i<startPad;i++) cells += '<div class="dr-day dr-muted"></div>'
+  const todayIso = isoDate(new Date())
+  for (let d=1; d<=daysInMonth; d++) {
+    const cellDate = new Date(y,m,d)
+    const iso = isoDate(cellDate)
+    let cls = 'dr-day'
+    if (iso === todayIso) cls += ' dr-today'
+    if (drStart && iso === drStart) cls += ' dr-start'
+    if (drEnd && iso === drEnd) cls += ' dr-end'
+    if (drStart && drEnd && iso > drStart && iso < drEnd) cls += ' dr-in-range'
+    cells += '<div class="'+cls+'" onclick="drPick(\''+iso+'\')">'+d+'</div>'
+  }
+  return '<div class="dr-month">'+nav+wd+'<div class="dr-days">'+cells+'</div></div>'
+}
+function drNav(dir) { drViewMonth.setMonth(drViewMonth.getMonth()+dir); renderDrPopover() }
+function drPick(iso) {
+  if (!drStart || (drStart && drEnd)) { drStart = iso; drEnd = null }
+  else if (iso < drStart) { drStart = iso }
+  else { drEnd = iso }
+  renderDrPopover()
+}
+function drClear() { drStart = null; drEnd = null; renderDrPopover() }
+function applyPreset(kind) {
+  const today = new Date()
+  let start = new Date(today), end = new Date(today)
+  if (kind === 'week') { end.setDate(today.getDate()+6) }
+  else if (kind === '2weeks') { end.setDate(today.getDate()+13) }
+  else if (kind === 'month') { start = new Date(today.getFullYear(), today.getMonth(), 1); end = new Date(today.getFullYear(), today.getMonth()+1, 0) }
+  drStart = isoDate(start); drEnd = isoDate(end)
+  renderDrPopover()
+}
+function drApply() {
+  filters.from = drStart || ''
+  filters.to = drEnd || ''
+  const btn = document.getElementById('dr-btn')
+  const label = document.getElementById('dr-btn-label')
+  if (drStart && drEnd) {
+    label.textContent = new Date(drStart).toLocaleDateString('en-US',{day:'numeric',month:'short'}) + ' – ' + new Date(drEnd).toLocaleDateString('en-US',{day:'numeric',month:'short'})
+    btn.classList.add('active')
+  } else {
+    label.textContent = 'Any Date'
+    btn.classList.remove('active')
+  }
+  document.getElementById('dr-popover').classList.remove('open')
+  page = 0; allLoaded = false
+  loadEvents()
+}
+
+// ── TOAST ──
+function toast(msg, isErr=false) {
+  const el = document.getElementById('toast')
+  document.getElementById('toast-msg').textContent = msg
+  el.className = 'toast' + (isErr ? ' error' : '')
+  el.querySelector('i').className = isErr ? 'ti ti-alert-circle' : 'ti ti-circle-check'
+  el.classList.add('show')
+  setTimeout(() => el.classList.remove('show'), 4000)
+}
+
+const st = document.createElement('style')
+st.textContent = '@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}'
+document.head.appendChild(st)
+
+init()
+</script>
+</body>
+</html>
